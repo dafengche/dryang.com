@@ -1,0 +1,10 @@
+{% load staticfiles %}
+
+<script type='text/javascript' src='{{ STATIC_URL }}demo/js/jquery.min.js'></script>
+<script type='text/javascript' src='{{ STATIC_URL }}demo/js/demo.js'></script>
+
+<h2>Demo app</h2>
+
+<form>{% csrf_token %}
+  <input id='a' value='3'/>&nbsp;+&nbsp;<input id='b' value='4'/>&nbsp;=&nbsp;<span id='result'>7</span>
+</form>
