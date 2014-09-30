@@ -45,15 +45,17 @@ $(function() {
 
   function compute(a, b, m) {
     var r = $('#result');
-    r.text();
+    r.text('...');
     $.ajax({
       url: 'calc/',
       type: 'post',
       dataType: 'json',
       data: JSON.stringify({'a': a, 'b': b, 'm': m}),
       success: function(result) {
-        if (result['result']) r.text(result['result']);
+        var r2 = result['result'];
+        if (r2 || r2 == +0) r.text(r2);
         else if (result['error']) r.text(result['error']);
+        else r.text('UNKNOWN RESULT');
       },
       error: function(result) {
         r.text(result);
