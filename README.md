@@ -1,4 +1,4 @@
 dryang.com
 ==========
 
-Django tutorial
+Django tutorial, jQuery, Celery (RabbitMQ + Redis)

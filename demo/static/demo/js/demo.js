@@ -25,25 +25,35 @@ $(function() {
   $('#a').on('keyup', function() {
     var a = parseFloat($(this).val());
     var b = parseFloat($('#b').val());
-    doCalc(a, b);
+    var m = $('#m').val();
+    compute(a, b, m);
   });
 
   $('#b').on('keyup', function() {
     var a = parseFloat($('#a').val());
     var b = parseFloat($(this).val());
-    doCalc(a, b);
+    var m = $('#m').val();
+    compute(a, b, m);
   });
 
-  function doCalc(a, b) {
+  $('#m').on('change', function() {
+    var a = parseFloat($('#a').val());
+    var b = parseFloat($('#b').val());
+    var m = $(this).val();
+    compute(a, b, m);
+  });
+
+  function compute(a, b, m) {
     var r = $('#result');
     r.text();
     $.ajax({
       url: 'calc/',
       type: 'post',
       dataType: 'json',
-      data: JSON.stringify({'a': a, 'b': b}),
+      data: JSON.stringify({'a': a, 'b': b, 'm': m}),
       success: function(result) {
-        r.text(result['result']);
+        if (result['result']) r.text(result['result']);
+        else if (result['error']) r.text(result['error']);
       },
       error: function(result) {
         r.text(result);

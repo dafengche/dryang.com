@@ -6,5 +6,13 @@
 <h2>Demo app</h2>
 
 <form>{% csrf_token %}
-  <input id='a' value='3'/>&nbsp;+&nbsp;<input id='b' value='4'/>&nbsp;=&nbsp;<span id='result'>7</span>
+  <input id='a' value='3'/>&nbsp;
+  <select id='m'>
+    <option value='add'>+</option>
+    <option value='sub'>-</option>
+    <option value='mul'>*</option>
+    <option value='div'>/</option>
+  </select>&nbsp;
+  <input id='b' value='4'/>&nbsp;
+  =&nbsp;<span id='result'>7</span>
 </form>

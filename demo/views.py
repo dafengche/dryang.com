@@ -15,9 +15,15 @@ def calc(request):
             logger.debug('Parameters: ' + str(params))
             a = float(params['a'])
             b = float(params['b'])
-            r = a + b
-            result = {'result': r}
-            logger.debug('result: ' + str(result))
-            return HttpResponse(json.dumps(result), content_type = 'application/json')
+            m = params['m']
+            args = [a, b]
+            kwargs = {}
+            try:
+                result = request.broker.execute('compute.' + m, *args, **kwargs)
+                logger.debug('Result: ' + str(result))
+                return HttpResponse(json.dumps(result), content_type = 'application/json')
+            except Exception as ex:
+                logger.error(ex)
+                return HttpResponse(json.dumps({'error': 'Request failed!'}), content_type = 'application/json')
 
     return HttpResponse(json.dumps({'error': 'Request unsupported!'}), content_type = 'application/json')
