@@ -84,6 +84,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Logging, 29SEP14
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -121,3 +122,7 @@ LOGGING = {
         },
     }
 }
+
+# Celery, 30SEP14
+BROKER_URL = 'amqp://mw01/'
+CELERY_RESULT_BACKEND = 'redis://mw01/'

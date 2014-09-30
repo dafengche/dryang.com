@@ -8,9 +8,11 @@ logger = logging.getLogger(__name__)
 
 class Broker(object):
     def __init__(self):
-        self.broker = Celery('demo',
-                            broker = 'amqp://mw01/',
-                            backend = 'redis://mw01/')
+#        self.broker = Celery('demo',
+#                            broker = 'amqp://mw01/',
+#                            backend = 'redis://mw01/')
+        self.broker = Celery('demo')
+        self.broker.config_from_object('django.conf:settings')
 
     def execute(self, task_name, *args, **kwargs):
         logger.debug('Calling task ' + task_name + '...')
