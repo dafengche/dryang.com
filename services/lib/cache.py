@@ -1,11 +1,12 @@
 import hashlib
 import json
+import logging
 import memcache
 
-from celery.utils.log import get_task_logger
-
 cache = None
-logger = get_task_logger(__name__)
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 class CacheControl(object):
 

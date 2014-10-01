@@ -21,7 +21,7 @@ CELERY_BIN="/home/celery/.virtualenvs/prod/bin/celery"
 
 # Extra command-line arguments to the worker
 #CELERYD_OPTS="--time-limit=300 --concurrency=2"
-CELERYD_OPTS="-c 2 -l debug"
+#CELERYD_OPTS="-c 2 -l debug"
 
 # %N will be replaced with the first part of the nodename.
 CELERYD_LOG_FILE="/var/log/celery/%N.log"
