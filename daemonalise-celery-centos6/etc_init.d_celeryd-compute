@@ -4,7 +4,7 @@
 # ============================================
 #
 # :Usage: /etc/init.d/celeryd {start|stop|force-reload|restart|try-restart|status}
-# :Configuration file: /etc/default/celeryd
+# :Configuration file: /etc/sysconfig/celeryd
 #
 # See http://docs.celeryq.org/en/latest/cookbook/daemonizing.html#init-script-celeryd
 
@@ -22,8 +22,11 @@
 
 # /etc/init.d/celeryd: start and stop the celery task worker daemon.
 
-if [ -f "/etc/default/celeryd-compute" ]; then
-    . /etc/default/celeryd-compute
+# Source function library
+#. /etc/init.d/functions
+
+if [ -f "/etc/sysconfig/celeryd-compute" ]; then
+    . /etc/sysconfig/celeryd-compute
 fi
 
 CELERYD_LOG_DIR=`dirname $CELERYD_LOG_FILE`
