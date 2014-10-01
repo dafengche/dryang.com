@@ -1,10 +1,11 @@
 import hashlib
 import json
-import logging
 import memcache
 
+from celery.utils.log import get_task_logger
+
 cache = None
-logger = logging.getLogger(__name__)
+logger = get_task_logger(__name__)
 
 class CacheControl(object):
 
@@ -20,7 +21,7 @@ class CacheControl(object):
     def __call__(self, f):
         def wrapped_f(*args, **kwargs):
             global cache
-            # Generate key - unique?
+            # Generate key - unique? package_name:class_name:function_name:args:kwargs
             m = hashlib.md5()
             margs = [x.__repr__() for x in args]
             mkwargs = [x.__repr__() for x in kwargs.values()]
