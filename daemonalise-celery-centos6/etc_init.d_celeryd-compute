@@ -29,6 +29,10 @@ if [ -f "/etc/sysconfig/celeryd-compute" ]; then
     . /etc/sysconfig/celeryd-compute
 fi
 
+if [ -n "$ADDITIONAL_PYTHONPATH" ]; then
+    export PYTHONPATH=$PYTHONPATH:$ADDITIONAL_PYTHONPATH
+fi
+
 CELERYD_LOG_DIR=`dirname $CELERYD_LOG_FILE`
 CELERYD_PID_DIR=`dirname $CELERYD_PID_FILE`
 if [ ! -d "$CELERYD_LOG_DIR" ]; then

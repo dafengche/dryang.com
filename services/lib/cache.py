@@ -12,17 +12,25 @@ class CacheControl(object):
         '''
         time = 0 means forever
         '''
+        global cache
         self.time = time
         self.host = '%s:%s' % (host, port)
         cache = memcache.Client([self.host])
 
     def __call__(self, f):
         def wrapped_f(*args, **kwargs):
-            name = f.func_name
-            req = (name, args, kwargs.items())
-            req_enc = json.dumps(req, sort_keys = True)
-            k = hashlib.md5(req_enc).hexdigest()
+            global cache
+            # Generate key - unique?
+            m = hashlib.md5()
+            margs = [x.__repr__() for x in args]
+            mkwargs = [x.__repr__() for x in kwargs.values()]
+            map(m.update, margs + mkwargs)
+            m.update(f.__name__)
+            m.update(f.__class__.__name__)
+            k = m.hexdigest()
+            name = f.__name__
             logger.debug('Cache control (%s) for %s ', k, name)
+
             v = cache.get(k)
             if v:
                 logger.debug('Cache control (%s) hit for %s', k, name)
