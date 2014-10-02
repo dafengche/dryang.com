@@ -25,8 +25,8 @@
 # Source function library
 #. /etc/init.d/functions
 
-if [ -f "/etc/sysconfig/celeryd-compute" ]; then
-    . /etc/sysconfig/celeryd-compute
+if [ -f "/etc/sysconfig/celeryd" ]; then
+    . /etc/sysconfig/celeryd
 fi
 
 if [ -n "$ADDITIONAL_PYTHONPATH" ]; then
