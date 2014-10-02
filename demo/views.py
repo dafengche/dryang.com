@@ -19,7 +19,7 @@ def calc(request):
             args = [a, b]
             kwargs = {}
             try:
-                result = request.broker.execute('compute.' + o, *args, **kwargs)
+                result = request.broker.execute('compute.compute.' + o, *args, **kwargs)
                 logger.debug('Result: ' + str(result))
                 return HttpResponse(json.dumps(result), content_type = 'application/json')
             except Exception as ex:
