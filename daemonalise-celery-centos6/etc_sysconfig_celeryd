@@ -6,15 +6,15 @@ CELERYD_NODES="compute"
 #CELERYD_NODES="worker1 worker2 worker3"
 
 # App instance to use, comment out this line if you don't use an app
-CELERY_APP="compute"
+CELERY_APP="compute.compute"
 # or fully qualified
 #CELERY_APP="proj.tasks:app"
 
 # Where to chdir at start
-CELERYD_CHDIR="/home/celery/git/dev/dryang.com/services/compute/"
+CELERYD_CHDIR="/home/celery/git/dev/dryang.com/services"
 
 # For PYTHONPATH
-ADDITIONAL_PYTHONPATH="/home/celery/git/dev/dryang.com/services/lib"
+#ADDITIONAL_PYTHONPATH=$CELERYD_CHDIR
 
 # Where is command celery
 CELERY_BIN="/home/celery/.virtualenvs/prod/bin/celery"

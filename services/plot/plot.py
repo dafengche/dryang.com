@@ -11,7 +11,7 @@ import os
 import pytz
 import socket
 
-from cache import CacheControl
+from servicelib.cache import CacheControl
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)

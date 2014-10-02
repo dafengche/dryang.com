@@ -1,5 +1,6 @@
 import unittest
-import compute
+
+from compute import compute
 
 class TestCompute(unittest.TestCase):
 
