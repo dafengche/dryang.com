@@ -1,6 +1,8 @@
+from __future__ import absolute_import
+
 import unittest
 
-from compute import compute
+from services.compute import compute
 
 class TestCompute(unittest.TestCase):
 

@@ -3,6 +3,11 @@ CELERY_RESULT_BACKEND = 'redis://'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
+#
+CELERY_INCLUDE = [
+    'services.compute.compute',
+    'services.plot.plot',
+]
 '''
 # Routing config
 from kombu import Exchange, Queue
