@@ -2,26 +2,26 @@
 #   most will only start one node:
 CELERYD_NODES="worker"
 #   but you can also start multiple and configure settings
-#   for each in CELERYD_OPTS (see `celery multi --help` for examples).
+#   for each in CELERYD_OPTS (see `celery multi --help` for examples)
 #CELERYD_NODES="worker1 worker2 worker3"
 
 # App instance to use, comment out this line if you don't use an app
-CELERY_APP="compute.compute"
+#CELERY_APP="compute"
 # or fully qualified
 #CELERY_APP="proj.tasks:app"
 
 # Where to chdir at start
-CELERYD_CHDIR="/home/celery/git/dev/dryang.com/services"
+CELERYD_CHDIR="/home/celery/git/dev/dryang.com"
 
 # For PYTHONPATH
-#ADDITIONAL_PYTHONPATH=$CELERYD_CHDIR
+ADDITIONAL_PYTHONPATH="/home/celery/.virtualenvs/prod/lib/python2.7/site-packages:$CELERYD_CHDIR/services"
 
 # Where is command celery
 CELERY_BIN="/home/celery/.virtualenvs/prod/bin/celery"
 
 # Extra command-line arguments to the worker
 #CELERYD_OPTS="--time-limit=300 --concurrency=2"
-#CELERYD_OPTS="-c 2 -l debug"
+#CELERYD_OPTS="-l debug"
 
 # %N will be replaced with the first part of the nodename.
 CELERYD_LOG_FILE="/var/log/celery/%N.log"
