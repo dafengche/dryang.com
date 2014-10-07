@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 OUTPUT_DIR = '/var/share/download_data'
+URL_PREFIX = 'http://web01:8008'
 
 @app.task
 def make_plot_mpl(params):
@@ -31,7 +32,7 @@ def make_plot_mpl(params):
 @CacheControl(time = 600)
 def _make_plot(params):
     plot_type = params['plot_type']
-    if plot_type not in ['histogram', 'mean_plot', 'scatter_plot', 'time_series']:
+    if plot_type not in ['histogram', 'mean_plot', 'scatter_plot', 'score_map', 'time_series']:
         return {'error': 'Unsupported plot type: ' + plot_type}
 
     # Plot, default size: 660x480px, 100dpi
@@ -53,15 +54,17 @@ def _make_plot(params):
     elif 'time_series' == plot_type:
         pass
     elif 'scatter_plot' == plot_type:
-        N = 50
-        x = np.random.rand(N)
-        y = np.random.rand(N)
-        colors = np.random.rand(N)
-        area = np.pi * (15 * np.random.rand(N)) ** 2 # 0 to 15 point radiuses
-        ax.scatter(x, y, s = area, c = colors, label = 'demo')
-        ax.legend()
+        pass
     elif 'histogram' == plot_type:
         pass
+
+    N = 50
+    x = np.random.rand(N)
+    y = np.random.rand(N)
+    colors = np.random.rand(N)
+    area = np.pi * (15 * np.random.rand(N)) ** 2 # 0 to 15 point radiuses
+    ax.scatter(x, y, s = area, c = colors, label = 'demo')
+    ax.legend()
 
     # Get metadata
     metadata = {}
@@ -81,13 +84,14 @@ def _make_plot(params):
     prefix = 'plot_make_plot'
     ts = datetime.utcnow().strftime('%Y%m%d%H%M%S')
     suffix = '.png'
-    name = '%s/%s-%s-%s-%04d%s' % (OUTPUT_DIR, socket.gethostname(), prefix, ts, os.getpid(), suffix)
-    logger.debug('Output: ' + name)
-    plt.savefig(name, dpi = DPI)
+    file_name = '%s-%s-%s-%04d%s' % (socket.gethostname(), prefix, ts, os.getpid(), suffix)
+    full_name = '%s/%s' % (OUTPUT_DIR, file_name)
+    logger.debug('Output: ' + full_name)
+    plt.savefig(full_name, dpi = DPI)
 
     # Set additional info
     output = {}
     output['metadata'] = metadata
-    output['url'] = 'some_where' # TODO
+    output['url'] = URL_PREFIX + '/' + file_name
 
     return output

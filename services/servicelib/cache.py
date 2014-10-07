@@ -37,7 +37,7 @@ class CacheControl(object):
 
             v = cache.get(k)
             if v:
-                logger.debug('Cache control (%s) hit for %s', k, name)
+                logger.debug('Cache control (%s) HIT for %s', k, name)
             else:
                 logger.debug('Cache control (%s) calling function for %s', k, name)
                 v = f(*args, **kwargs)
