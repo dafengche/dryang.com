@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'demo',
+    'maccverif',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -47,7 +48,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'demo.broker.Broker',
+    'common.broker.Broker',
 )
 
 ROOT_URLCONF = 'apps.urls'
@@ -116,6 +117,11 @@ LOGGING = {
 #            'level': 'INFO',
 #        },
         'demo': {
+#            'handlers': ['console', 'file'],
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+        'maccverif': {
 #            'handlers': ['console', 'file'],
             'handlers': ['console'],
             'level': 'DEBUG',
