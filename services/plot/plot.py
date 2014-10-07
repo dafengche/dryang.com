@@ -4,6 +4,8 @@ import matplotlib
 matplotlib.use('Agg') # Non-interactive backend
 
 import logging
+import matplotlib.dates as dates
+import matplotlib.lines as lines
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -11,6 +13,7 @@ import pytz
 import socket
 
 from datetime import datetime
+from mpl_toolkits.basemap import Basemap
 
 from services.celery import app
 from services.servicelib.cache import CacheControl
@@ -39,32 +42,103 @@ def _make_plot(params):
     DPI = 100
     width = 6.6
     height = 4.8
+    if 'score_map' == plot_type:
+        width = 8.
+        height = 4.8
     if 'plot_width' in params:
         width = params['plot_width'] / float(DPI)
     if 'plot_height' in params:
         height = params['plot_height'] / float(DPI)
     logger.debug('Plot size: width = ' + str(width) + ', height = ' + str(height))
-    fig = plt.figure(figsize=(width, height))
+    fig = plt.figure(figsize = (width, height))
     ax = fig.add_subplot(1, 1, 1) # Returns an Axes instance
 
     if 'mean_plot' == plot_type:
-        pass
-    elif 'score_map' == plot_type:
-        pass 
-    elif 'time_series' == plot_type:
-        pass
-    elif 'scatter_plot' == plot_type:
-        pass
-    elif 'histogram' == plot_type:
-        pass
+        x = np.linspace(-2, 2, 100)
 
-    N = 50
-    x = np.random.rand(N)
-    y = np.random.rand(N)
-    colors = np.random.rand(N)
-    area = np.pi * (15 * np.random.rand(N)) ** 2 # 0 to 15 point radiuses
-    ax.scatter(x, y, s = area, c = colors, label = 'demo')
-    ax.legend()
+        ax.plot(x, x, label = 'linear')
+        ax.plot(x, x**2, label = 'quadratic')
+        ax.plot(x, x**3, label = 'cubic')
+
+        ax.set_xlabel('x')
+        ax.set_ylabel('y')
+        ax.set_title('Simple plot')
+        #ax.set_xlim(-2, 2)
+        ax.set_ylim(-8, 8)
+        ax.grid(True)
+        ax.legend()
+    elif 'score_map' == plot_type:
+        lats = [47.8, -54.85, 47.0544, 44.18, 47.42, 46.55]
+        lons = [11.02, -68.32, 12.9583, 10.7, 10.98, 7.99]
+        scores = [4.93657698397, -31.0626756529, 35.2049971001, 23.1060270438, 12.5139213403, 17.3946319493]
+
+        map = Basemap(projection = 'mill', resolution = 'l')
+        map.drawcoastlines()
+#        map.drawcountries()
+#        map.fillcontinents(color = 'gray')
+        map.drawmapboundary()
+        map.drawmeridians(np.arange(0, 360, 20))
+        map.drawparallels(np.arange(-90, 90, 10))
+
+        x, y  = map(lons, lats) # Notice x = lon, y = lat
+        scat = map.scatter(x, y, marker = 'o',
+                s = 100,
+                c = scores,
+                cmap = plt.get_cmap('rainbow')
+                )
+
+        plt.title('MACC-III GAW verification score map')
+
+        map.colorbar(scat, 'bottom', size = '5%', pad = '2%')
+        ax.legend()
+    elif 'time_series' == plot_type:
+        x = np.array([datetime(2013, m, 20, 0, 0) for m in range(1, 13)])
+        y = np.random.randint(100, size = x.shape)
+        ax.plot_date(x, y, label = 'obs')
+        ax.xaxis.set_major_formatter(dates.DateFormatter('%Y-%m-%d'))
+        plt.xticks(rotation = 20)
+        ax.grid(True)
+        ax.legend()
+    elif 'scatter_plot' == plot_type:
+        N = 50
+        x = np.random.rand(N)
+        y = np.random.rand(N)
+        colors = np.random.rand(N)
+        area = np.pi * (15 * np.random.rand(N)) ** 2 # 0 to 15 point radiuses
+        ax.scatter(x, y, s = area, c = colors, label = 'demo')
+        ax.legend()
+    elif 'histogram' == plot_type:
+        xl = []
+        mu, sigma = 100, 15
+        x = mu + sigma * np.random.randn(10000)
+        xl.append(x)
+
+        mu, sigma = 100, 20
+        x = mu + sigma * np.random.randn(10000)
+        xl.append(x)
+
+        n, bins, patches = ax.hist(xl, bins = 50, normed = True,
+                    alpha = 0.75, histtype='step',
+                    color = ['b', 'r'],
+                    label = [r'$\sigma=15$', '$\sigma=20$']
+                    )
+
+        # The default legend of histogram shows boxes rather than lines. To show lines,
+        # custom artists are required
+        #artist_0 = plt.Line2D((0, 1), (0, 0), color = 'b')
+        #artist_1 = plt.Line2D((0, 1), (0, 0), color = 'r')
+        artist_0 = lines.Line2D((0, 1), (0, 0), color = 'b')
+        artist_1 = lines.Line2D((0, 1), (0, 0), color = 'r')
+
+        # Create legend from custom artist/label lists
+        ax.legend([artist_0, artist_1], [r'$\sigma=15$', '$\sigma=20$'])
+
+        ax.set_xlabel('Value')
+        ax.set_ylabel('Frequency')
+        ax.set_title(r'$\mathrm{Standard\ normal\ distribution:}\ \mu=100$')
+        ax.set_xlim(40, 160)
+        ax.set_ylim(0, 0.03)
+        ax.grid(True)
 
     # Get metadata
     metadata = {}
