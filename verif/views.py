@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def index(request):
-    return render(request, 'maccverif/index.html')
+    return render(request, 'verif/index.html')
 
 def get_plot(request):
     if request.is_ajax():

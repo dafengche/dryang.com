@@ -7,6 +7,6 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(r'^demo/', include('demo.urls', namespace = 'demo')),
-    url(r'^maccverif/', include('maccverif.urls', namespace = 'maccverif')),
+    url(r'^verif/', include('verif.urls', namespace = 'verif')),
     url(r'^admin/', include(admin.site.urls)),
 )

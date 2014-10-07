@@ -18,15 +18,18 @@ class Broker(object):
         logger.debug('Calling task ' + task_name + '...')
         result = self.broker.send_task(task_name, args = args, kwargs = {})
         counter = 0
-        while counter < 10:
+        times_to_try = 5
+        time_interval = 1
+        while counter < times_to_try:
             if result.ready():
                 logger.debug('Got result!')
                 return {'result': result.result}
             else:
-                logger.debug('Waiting for 1 second...')
-                time.sleep(1)
+                logger.debug('Waiting for %d  second...' % time_interval)
+                time.sleep(time_interval)
                 counter += 1
-        if counter >= 3:
+                time_interval += 1
+        if counter >= times_to_try:
             return {'error': "I'm not that patient, haven't got the result"}
 
     def process_request(self, request):

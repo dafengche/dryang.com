@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 
-from maccverif import views
+from verif import views
 
 urlpatterns = patterns('',
     url(r'^$', views.index, name = 'index'),

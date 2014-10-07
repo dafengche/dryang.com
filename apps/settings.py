@@ -37,7 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'demo',
-    'maccverif',
+    'verif',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -121,7 +121,7 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',
         },
-        'maccverif': {
+        'verif': {
 #            'handlers': ['console', 'file'],
             'handlers': ['console'],
             'level': 'DEBUG',

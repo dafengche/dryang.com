@@ -22,38 +22,35 @@ $(function() {
     }
   });
 
-//  $('#maccverif_plot_type').on('change', function() {
-//    console.log($(this).val());
-//  });
+  getPlot();
 
-  $('#maccverif_plot_btn').on('click', function(e) {
-    e.preventDefault();
+  $('#verif_plot_type').on('change', function() {
+    getPlot();
+  });
 
-    var pt = $('#maccverif_plot_type').val();
-    console.log('Plot type: ' + pt);
-
-    var msg = $('#maccverif_msg').text('');
-    var img = $('#maccverif_img').attr('src', STATIC_URL + 'maccverif/images/loading.gif');
-    $('#maccverif_block_plot').show();
+  function getPlot() {
+    var msg = $('#verif_msg').text('');
+    var img = $('#verif_img').attr('src', STATIC_URL + 'verif/images/loading.gif');
+    $('#verif_block_plot').show();
 
     $.ajax({
       url: 'get-plot/',
       type: 'post',
       dataType: 'json',
-      data: JSON.stringify({'plot_type': pt}),
+      data: JSON.stringify({'plot_type': $('#verif_plot_type').val()}),
       success: function(result) {
         if (result['error']) {
 //          msg.text(result['error']);
-          img.attr('src', STATIC_URL + 'maccverif/images/failed.jpg');
+          img.attr('src', STATIC_URL + 'verif/images/failed.jpg');
           return;
         }
         img.attr('src', result['result']['url']);
       },
       error: function(result) {
 //        msg.text(result['error']);
-        img.attr('src', '{{ STATIC_URL }}maccverif/images/failed.jpg');
+        img.attr('src', '{{ STATIC_URL }}verif/images/failed.jpg');
       }
     });
-  });
+  }
 
 });
