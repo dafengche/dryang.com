@@ -1,0 +1,9 @@
+#leftColumn {
+  float: left;
+  margin: 0 2em 1em 0; /* top, right, bottom, left */
+  width: 10em;
+}
+
+#mainColumn {
+  float: left;
+}

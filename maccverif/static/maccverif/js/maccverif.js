@@ -22,9 +22,9 @@ $(function() {
     }
   });
 
-  $('#maccverif_plot_type').on('change', function() {
-    alert($(this).val());
-  });
+//  $('#maccverif_plot_type').on('change', function() {
+//    console.log($(this).val());
+//  });
 
   $('#maccverif_plot_btn').on('click', function(e) {
     e.preventDefault();
@@ -33,6 +33,7 @@ $(function() {
     console.log('Plot type: ' + pt);
 
     var msg = $('#maccverif_msg').text('');
+    var img = $('#maccverif_img').attr('src', STATIC_URL + 'maccverif/images/loading.gif');
     $('#maccverif_block_plot').show();
 
     $.ajax({
@@ -42,19 +43,15 @@ $(function() {
       data: JSON.stringify({'plot_type': pt}),
       success: function(result) {
         if (result['error']) {
-          msg.text(result['error']);
+//          msg.text(result['error']);
+          img.attr('src', STATIC_URL + 'maccverif/images/failed.jpg');
           return;
-        }
-        var chart = $('#maccverif_chart');
-        var img = $('#maccverif_chart_img');
-        if (img.length == 0) {
-          img = $('<img>', {id: 'maccverif_chart_img'});
-          img.appendTo(chart);
         }
         img.attr('src', result['result']['url']);
       },
       error: function(result) {
-        msg.text(result['error']);
+//        msg.text(result['error']);
+        img.attr('src', '{{ STATIC_URL }}maccverif/images/failed.jpg');
       }
     });
   });

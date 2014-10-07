@@ -1,36 +1,41 @@
 {% load staticfiles %}
 
+<link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}maccverif/css/maccverif.css'/>
+
 <script type='text/javascript' src='{{ STATIC_URL }}maccverif/js/jquery.min.js'></script>
 <script type='text/javascript' src='{{ STATIC_URL }}maccverif/js/maccverif.js'></script>
+<script type='text/javascript'>
+  var STATIC_URL = '{{ STATIC_URL }}';
+</script>
 
 <h2>MACC Verification App</h2>
 
 {% comment %}
 Navigation menu
 {% endcomment %}
-<form>{% csrf_token %}
-<div class="sideBlock">
-  <select id="maccverif_plot_type" style="width:120px;">
-    <option value="mean_plot">Mean plot</option>
-    <option value="score_map" selected="selected">Score map</option>
-    <option value="time_series">Time series</option>
-    <option value="scatter_plot">Scatter plot</option>
-    <option value="histogram">Histogram</option>
-  </select>
+<div id="leftColumn">
+  <form>{% csrf_token %}
+    <select id="maccverif_plot_type" style="width:120px;">
+      <option value="mean_plot">Mean plot</option>
+      <option value="score_map" selected="selected">Score map</option>
+      <option value="time_series">Time series</option>
+      <option value="scatter_plot">Scatter plot</option>
+      <option value="histogram">Histogram</option>
+    </select>
 
-  <div>
-    <br/>
-    <input id="maccverif_plot_btn" type="submit" value="Plot"/>
-  </div>
+    <div>
+      <br/>
+      <input id="maccverif_plot_btn" type="submit" value="Plot"/>
+    </div>
+  </form>
 </div>
-</form>
 
 {% comment %}
 Main body
 {% endcomment %}
-<div class="mainBody">
+<div id="mainColumn">
   <div id="maccverif_block_plot" style="display:none">
     <label id="maccverif_msg"></label>
-    <div id="maccverif_chart"></div>
+    <img id="maccverif_img"></img>
   </div>
 </div>
