@@ -53,6 +53,17 @@ def _make_plot(params):
     fig = plt.figure(figsize = (width, height))
     ax = fig.add_subplot(1, 1, 1) # Returns an Axes instance
 
+    # TODO: Get bounding box from client (score map)
+    sw_lat = -90.
+    sw_lon = -180.
+    ne_lat = 90.
+    ne_lon = 180.
+    # Europe
+    sw_lat = 27.636311
+    sw_lon = -31.266001
+    ne_lat = 81.008797
+    ne_lon = 39.869301
+
     if 'mean_plot' == plot_type:
         x = np.linspace(-2, 2, 100)
 
@@ -72,7 +83,13 @@ def _make_plot(params):
         lons = [11.02, -68.32, 12.9583, 10.7, 10.98, 7.99]
         scores = [4.93657698397, -31.0626756529, 35.2049971001, 23.1060270438, 12.5139213403, 17.3946319493]
 
-        map = Basemap(projection = 'mill', resolution = 'l')
+        map = Basemap(projection = 'mill',
+                resolution = 'l',
+                llcrnrlon = sw_lon,
+                llcrnrlat = sw_lat,
+                urcrnrlon = ne_lon,
+                urcrnrlat = ne_lat
+                )
         map.drawcoastlines()
 #        map.drawcountries()
 #        map.fillcontinents(color = 'gray')
@@ -87,14 +104,18 @@ def _make_plot(params):
                 cmap = plt.get_cmap('rainbow')
                 )
 
-        plt.title('MACC-III GAW verification score map')
+        plt.title('Verification score map')
 
         map.colorbar(scat, 'bottom', size = '5%', pad = '2%')
         ax.legend()
     elif 'time_series' == plot_type:
-        x = np.array([datetime(2013, m, 20, 0, 0) for m in range(1, 13)])
-        y = np.random.randint(100, size = x.shape)
-        ax.plot_date(x, y, label = 'obs')
+#        x = np.array([datetime(2013, m, 20, 0, 0) for m in range(1, 13)])
+#        y = np.random.randint(100, size = x.shape)
+        x, y = np.loadtxt(OUTPUT_DIR + '/date-against-value.csv',
+                    unpack = True,
+                    converters = { 0: dates.strpdate2num('%Y-%m-%d') }
+                    )
+        ax.plot_date(x, y, fmt = 'r-', label = 'obs')
         ax.xaxis.set_major_formatter(dates.DateFormatter('%Y-%m-%d'))
         plt.xticks(rotation = 20)
         ax.grid(True)
@@ -153,6 +174,12 @@ def _make_plot(params):
     if 'time_series' == plot_type:
         metadata['x_min'] = dates.num2date(metadata['x_min'], tz = pytz.utc).strftime('%Y-%m-%d')
         metadata['x_max'] = dates.num2date(metadata['x_max'], tz = pytz.utc).strftime('%Y-%m-%d')
+    elif 'score_map' == plot_type:
+        metadata['x_min'] = sw_lon
+        metadata['y_min'] = sw_lat
+        metadata['x_max'] = ne_lon
+        metadata['y_max'] = ne_lat
+        # TODO: subplot_left|right|bottom|top
     logger.debug(metadata)
 
     prefix = 'plot_make_plot'
