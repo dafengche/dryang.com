@@ -58,11 +58,11 @@ def _make_plot(params):
     sw_lon = -180.
     ne_lat = 90.
     ne_lon = 180.
-    # Europe
-    sw_lat = 27.636311
-    sw_lon = -31.266001
-    ne_lat = 81.008797
-    ne_lon = 39.869301
+#    # Europe
+#    sw_lat = 27.636311
+#    sw_lon = -31.266001
+#    ne_lat = 81.008797
+#    ne_lon = 39.869301
 
     if 'mean_plot' == plot_type:
         x = np.linspace(-2, 2, 100)
@@ -83,12 +83,14 @@ def _make_plot(params):
         lons = [11.02, -68.32, 12.9583, 10.7, 10.98, 7.99]
         scores = [4.93657698397, -31.0626756529, 35.2049971001, 23.1060270438, 12.5139213403, 17.3946319493]
 
+        # TODO: Set resolution according to area dimension
         map = Basemap(projection = 'mill',
-                resolution = 'l',
-                llcrnrlon = sw_lon,
-                llcrnrlat = sw_lat,
-                urcrnrlon = ne_lon,
-                urcrnrlat = ne_lat
+                llcrnrlon  = sw_lon,
+                llcrnrlat  = sw_lat,
+                urcrnrlon  = ne_lon,
+                urcrnrlat  = ne_lat,
+                fix_aspect = False,
+                resolution = 'l'
                 )
         map.drawcoastlines()
 #        map.drawcountries()
@@ -179,7 +181,6 @@ def _make_plot(params):
         metadata['y_min'] = sw_lat
         metadata['x_max'] = ne_lon
         metadata['y_max'] = ne_lat
-        # TODO: subplot_left|right|bottom|top
     logger.debug(metadata)
 
     prefix = 'plot_make_plot'
