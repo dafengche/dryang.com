@@ -44,7 +44,7 @@ def _make_plot(params):
     height = 4.8
     if 'score_map' == plot_type:
         width = 8.
-        height = 4.8
+        height = 4.5
     if 'plot_width' in params:
         width = params['plot_width'] / float(DPI)
     if 'plot_height' in params:
@@ -104,10 +104,10 @@ def _make_plot(params):
                 cmap = plt.get_cmap('rainbow')
                 )
 
-        plt.title('Verification score map')
+#        plt.title('Verification score map')
 
-        map.colorbar(scat, 'bottom', size = '5%', pad = '2%')
-        ax.legend()
+#        map.colorbar(scat, 'bottom', size = '5%', pad = '2%')
+#        ax.legend()
     elif 'time_series' == plot_type:
 #        x = np.array([datetime(2013, m, 20, 0, 0) for m in range(1, 13)])
 #        y = np.random.randint(100, size = x.shape)
