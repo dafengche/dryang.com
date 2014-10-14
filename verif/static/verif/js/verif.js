@@ -22,30 +22,39 @@ $(function() {
     }
   });
 
-  getPlot();
+  getPlot({'plot_type': $('#verif_plot_type').val()});
 
   $('#verif_plot_type').on('change', function() {
-    getPlot();
+    getPlot({'plot_type': $(this).val()});
   });
 
-  function getPlot() {
+  function getPlot(params) {
+//    console.log(params);
     var msg = $('#verif_msg').text('');
     var img = $('#verif_img').attr('src', STATIC_URL + 'verif/images/loading.gif');
-    var pt = $('#verif_plot_type').val();
-    $('#verif_block_plot').show();
+    var container = $('#verif_container').unbind();
+    setContainerDimension(container, img);
+
+    var pt = params['plot_type'];
 
     $.ajax({
       url: 'get-plot/',
       type: 'post',
       dataType: 'json',
-      data: JSON.stringify({'plot_type': pt}),
+      data: JSON.stringify(params),
       success: function(result) {
         if (result['error']) {
 //          msg.text(result['error']);
           img.attr('src', STATIC_URL + 'verif/images/failed.jpg');
+          setContainerDimension(container, img);
           return;
         }
         img.attr('src', result['result']['url']);
+        setContainerDimension(container, img);
+
+        if ('time_series' != pt && 'score_map' != pt) {
+          return;
+        }
 
         // Zoom
         var md = result['result']['metadata'];
@@ -54,46 +63,95 @@ $(function() {
           md['x_max'] = new Date(md['x_max']).getTime();
         }
 
+        var rect = $('<div>').addClass('verif_rect');
         var drag = false;
         var startX, startY;
-        var x1, x2, y1, y2; // To be sent to the backend
-        img.unbind().on('mouseenter', function(e) {
+        var x1, x2, y1, y2;
+
+        container.on('mouseenter', function(e) {
           e.preventDefault();
-          img.css('cursor', 'crosshair');
+          container.css('cursor', 'crosshair');
         }).on('mouseleave', function(e) {
           e.preventDefault();
-          img.css('cursor', 'default');
-          msg.text('');
-        }).on('mousemove', function(e) {
-          e.preventDefault();
-          // Get X and Y
-          var offset = $(this).offset();
-          var xy = getXY(x = e.pageX - offset.left, e.pageY - offset.top, md);
-          var x = xy[0];
-          var y = xy[1];
-          if (x >= md['x_min'] && x <= md['x_max']
-            && y >= md['y_min'] && y <= md['y_max']) {
-            if ('time_series' == pt) {
-              x = new Date(x);
-              // jQuery dateFormat plugin or datepicker.formatDate() from the jQuery UI plugin could be used to format date
-              x = x.getUTCFullYear().toString() + '-' +
-                (x.getUTCMonth() + 1).toString() + '-' +
-                x.getUTCDate() + ' ' +
-                x.getUTCHours() + ':' +
-                x.getUTCMinutes() + ':' +
-                x.getUTCSeconds();
-            }
-            msg.text('(' + x + ', ' + y + ')');
-          }
+          container.css('cursor', 'default');
         }).on('mousedown', function(e) {
           e.preventDefault();
+          drag = true;
+          startX = e.pageX, startY = e.pageY;
+//          console.log('Mouse down at (' + startX + ', ' + startY + ')');
+          rect.css({
+            'top'   : startY + 'px',
+            'left'  : startX + 'px',
+            'width' : '0px',
+            'height': '0px'
+          });
+          rect.appendTo(container);
+
+          var offset = $(this).offset();
+          var xy = getXY(startX - offset.left, startY - offset.top, md);
+          x1 = xy[0], y1 = xy[1];
+//          console.log('-> (' + x1 + ', ' + y1 + ')');
+        }).on('mousemove', function(e) {
+          e.preventDefault();
+          if (drag) { // Draw a rectangle
+            var endX = e.pageX, endY = e.pageY;
+//            console.log('Mouse move at (' + endX + ', ' + endY + ')');
+            var width = Math.abs(endX - startX);
+            var height = Math.abs(endY - startY);
+            var newX = (endX < startX) ? (startX - width) : startX;
+            var newY = (endY < startY) ? (startY - height) : startY;
+            rect.css({
+              'width'           : width + 'px',
+              'height'          : height + 'px',
+              'top'             : newY + 'px',
+              'left'            : newX + 'px',
+              'background-color': '#C0C0C0',
+              'zoom'            : 1,
+              'filter'          : 'alpha(opacity = 50)',
+              'opacity'         : 0.5
+            });
+          }
         }).on('mouseup', function(e) {
           e.preventDefault();
+          drag = false;
+          var endX = e.pageX, endY = e.pageY;
+//          console.log('Mouse up at (' + endX + ', ' + endY + ')');
+          rect.remove();
+
+          var offset = $(this).offset();
+          var xy = getXY(endX - offset.left, endY - offset.top, md);
+          x2 = xy[0], y2 = xy[1];
+//          console.log('-> (' + x2 + ', ' + y2 + ')');
+
+          if (x1 > x2) [x1, x2] = [x2, x1];
+          if (y1 > y2) [y1, y2] = [y2, y1];
+          x1 = x1 < md['x_min'] ? md['x_min'] : x1;
+          y1 = y1 < md['y_min'] ? md['y_min'] : y1;
+          x2 = x2 > md['x_max'] ? md['x_max'] : x2;
+          y2 = y2 > md['y_max'] ? md['y_max'] : y2;
+
+          if ('time_series' == pt) {
+            x1 = new Date(x1);
+            x2 = new Date(x2);
+            params['start_date'] = x1;
+            params['end_date'] = x2;
+          } else { // score_map
+            params['sw_lon'] = x1;
+            params['sw_lat'] = y1;
+            params['ne_lon'] = x2;
+            params['ne_lat'] = y2;
+          }
+//          console.log('Area selected: sw(' + x1 + ', ' + y1 + '), ne('
+//            + x2 + ', ' + y2 + ')');
+
+          // Request a updated plot
+          getPlot(params);
         });
       },
       error: function(result) {
 //        msg.text(result['error']);
         img.attr('src', '{{ STATIC_URL }}verif/images/failed.jpg');
+        setContainerDimension(container, img);
       }
     });
   }
@@ -120,6 +178,13 @@ $(function() {
 //    console.log('-> (' + x + ', ' + y + ')');
 
     return [x, y];
+  }
+
+  function setContainerDimension(container, img) {
+    container.css({
+      'width' : img.width(),
+      'height': img.height()
+    });
   }
 
 });

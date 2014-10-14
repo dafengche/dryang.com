@@ -16,7 +16,7 @@ def get_plot(request):
         if request.method == 'POST':
             params = json.loads(request.body)
             logger.debug('Parameters: ' + str(params))
-            args = [{'plot_type': params['plot_type']}]
+            args = [params]
             kwargs = {}
             try:
                 result  = request.broker.execute('services.plot.plot.make_plot_mpl', *args, **kwargs)
