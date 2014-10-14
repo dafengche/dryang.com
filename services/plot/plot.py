@@ -53,17 +53,6 @@ def _make_plot(params):
     fig = plt.figure(figsize = (width, height))
     ax = fig.add_subplot(1, 1, 1) # Returns an Axes instance
 
-    # TODO: Get bounding box from client (score map)
-    sw_lat = -90.
-    sw_lon = -180.
-    ne_lat = 90.
-    ne_lon = 180.
-#    # Europe
-#    sw_lat = 27.636311
-#    sw_lon = -31.266001
-#    ne_lat = 81.008797
-#    ne_lon = 39.869301
-
     if 'mean_plot' == plot_type:
         x = np.linspace(-2, 2, 100)
 
@@ -79,12 +68,32 @@ def _make_plot(params):
         ax.grid(True)
         ax.legend()
     elif 'score_map' == plot_type:
+        sw_lat = -90.
+        sw_lon = -180.
+        ne_lat = 90.
+        ne_lon = 180.
+#        # Europe
+#        sw_lat = 27.636311
+#        sw_lon = -31.266001
+#        ne_lat = 81.008797
+#        ne_lon = 39.869301
+        if 'sw_lat' in params:
+            sw_lat = params['sw_lat']
+        if 'sw_lon' in params:
+            sw_lon = params['sw_lon']
+        if 'ne_lat' in params:
+            ne_lat = params['ne_lat']
+        if 'ne_lon' in params:
+            ne_lon = params['ne_lon']
+        logger.debug('(sw_lat, sw_lon): (' + str(sw_lat) + ', ' + str(sw_lon) + ')')
+        logger.debug('(ne_lat, ne_lon): (' + str(ne_lat) + ', ' + str(ne_lon) + ')')
+
         lats = [47.8, -54.85, 47.0544, 44.18, 47.42, 46.55]
         lons = [11.02, -68.32, 12.9583, 10.7, 10.98, 7.99]
         scores = [4.93657698397, -31.0626756529, 35.2049971001, 23.1060270438, 12.5139213403, 17.3946319493]
 
         # TODO: Set resolution according to area dimension
-        map = Basemap(projection = 'mill',
+        map = Basemap(projection = 'cyl',
                 llcrnrlon  = sw_lon,
                 llcrnrlat  = sw_lat,
                 urcrnrlon  = ne_lon,
@@ -96,8 +105,10 @@ def _make_plot(params):
 #        map.drawcountries()
 #        map.fillcontinents(color = 'gray')
         map.drawmapboundary()
-        map.drawmeridians(np.arange(0, 360, 20))
-        map.drawparallels(np.arange(-90, 90, 10))
+        # TODO: Set parallels and meridians intervals according to area dimension
+        # labels = [left, right, top, bottom]
+        map.drawmeridians(np.arange(0, 360, 20), labels = [0, 0, 1, 1])
+        map.drawparallels(np.arange(-90, 90, 10), labels = [1, 1, 0, 0])
 
         x, y  = map(lons, lats) # Notice x = lon, y = lat
         scat = map.scatter(x, y, marker = 'o',
@@ -111,6 +122,15 @@ def _make_plot(params):
 #        map.colorbar(scat, 'bottom', size = '5%', pad = '2%')
 #        ax.legend()
     elif 'time_series' == plot_type:
+        start_date = None
+        end_date = None
+        if 'start_date' in params:
+            start_date = params['start_date']
+        if 'end_date' in params:
+            end_date = params['end_date']
+        logger.debug('start_date: ' + str(start_date))
+        logger.debug('end_date: ' + str(end_date))
+
 #        x = np.array([datetime(2013, m, 20, 0, 0) for m in range(1, 13)])
 #        y = np.random.randint(100, size = x.shape)
         x, y = np.loadtxt(OUTPUT_DIR + '/date-against-value.csv',
