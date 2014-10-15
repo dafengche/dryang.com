@@ -28,7 +28,7 @@
   z-index : 2;
 }
 
-.verif_rect {
+#verif_rect {
   position: absolute;
   border  : 1px dotted #000;
   z-index : 3;

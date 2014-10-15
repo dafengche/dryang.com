@@ -63,7 +63,7 @@ $(function() {
           md['x_max'] = new Date(md['x_max']).getTime();
         }
 
-        var rect = $('<div>').addClass('verif_rect');
+        var rect = $('<div>', {id: 'verif_rect'});
         var drag = false;
         var startX, startY;
         var x1, x2, y1, y2;
@@ -135,14 +135,15 @@ $(function() {
             x2 = new Date(x2);
             params['start_date'] = x1;
             params['end_date'] = x2;
+//            console.log('Date range selected: ' + x1 + ', ' + x2);
           } else { // score_map
             params['sw_lon'] = x1;
             params['sw_lat'] = y1;
             params['ne_lon'] = x2;
             params['ne_lat'] = y2;
+            console.log('Area selected: sw(' + x1 + ', ' + y1 + '), ne('
+              + x2 + ', ' + y2 + ')');
           }
-//          console.log('Area selected: sw(' + x1 + ', ' + y1 + '), ne('
-//            + x2 + ', ' + y2 + ')');
 
           // Request a updated plot
           getPlot(params);
