@@ -9,6 +9,7 @@ import matplotlib.lines as lines
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import psycopg2
 import pytz
 import socket
 
@@ -25,6 +26,11 @@ logger.setLevel(logging.DEBUG)
 OUTPUT_DIR = '/var/share/download_data'
 URL_PREFIX = 'http://web01:8008'
 
+HOST = 'db01'
+DB = 'verif'
+USER = 'verif'
+PASS = 'verif'
+
 @app.task
 def make_plot_mpl(params):
     logger.debug('make_plot_mpl() called')
@@ -37,6 +43,10 @@ def _make_plot(params):
     plot_type = params['plot_type']
     if plot_type not in ['histogram', 'mean_plot', 'scatter_plot', 'score_map', 'time_series']:
         return {'error': 'Unsupported plot type: ' + plot_type}
+
+    dataset = params['dataset']
+    if dataset not in ['emep', 'gaw']:
+        return {'error': 'Unsupported dataset: ' + dataset}
 
     # Plot, default size: 660x480px, 100dpi
     DPI = 100
@@ -52,6 +62,7 @@ def _make_plot(params):
     logger.debug('Plot size: width = ' + str(width) + ', height = ' + str(height))
     fig = plt.figure(figsize = (width, height))
     ax = fig.add_subplot(1, 1, 1) # Returns an Axes instance
+
 
     if 'mean_plot' == plot_type:
         x = np.linspace(-2, 2, 100)
@@ -88,9 +99,27 @@ def _make_plot(params):
         logger.debug('(sw_lat, sw_lon): (' + str(sw_lat) + ', ' + str(sw_lon) + ')')
         logger.debug('(ne_lat, ne_lon): (' + str(ne_lat) + ', ' + str(ne_lon) + ')')
 
-        lats = [47.8, -54.85, 47.0544, 44.18, 47.42, 46.55]
-        lons = [11.02, -68.32, 12.9583, 10.7, 10.98, 7.99]
-        scores = [4.93657698397, -31.0626756529, 35.2049971001, 23.1060270438, 12.5139213403, 17.3946319493]
+        # Query database to get station info
+        query = None
+        if dataset == 'emep':
+            query = ('SELECT id, station_latitude_deg, station_longitude_deg '
+                    'FROM gac_emep_stations')
+        else: # GAW
+            query = ('SELECT id, lat, lon FROM gac_gaw_stations')
+        stn_data = _query_db(query)
+        logger.debug(query)
+        logger.debug(str(stn_data['number_of_results']) + ' record(s) retrieved')
+        stn_id_list = []
+        stn_lat_list = []
+        stn_lon_list = []
+        for stn in stn_data['data']:
+            stn_id_list.append(stn[0])
+            stn_lat_list.append(stn[1])
+            stn_lon_list.append(stn[2])
+
+#        stn_lat_list = [47.8, -54.85, 47.0544, 44.18, 47.42, 46.55]
+#        stn_lon_list = [11.02, -68.32, 12.9583, 10.7, 10.98, 7.99]
+#        scores = [4.93657698397, -31.0626756529, 35.2049971001, 23.1060270438, 12.5139213403, 17.3946319493]
 
         # TODO: Set resolution according to area dimension
         map = Basemap(projection = 'cyl',
@@ -110,12 +139,13 @@ def _make_plot(params):
         map.drawmeridians(np.arange(0, 360, 20), labels = [0, 0, 1, 1])
         map.drawparallels(np.arange(-90, 90, 10), labels = [1, 1, 0, 0])
 
-        x, y  = map(lons, lats) # Notice x = lon, y = lat
-        scat = map.scatter(x, y, marker = 'o',
-                s = 100,
-                c = scores,
-                cmap = plt.get_cmap('rainbow')
-                )
+        x, y  = map(stn_lon_list, stn_lat_list) # Notice x = lon, y = lat
+#        scat = map.scatter(x, y, marker = 'o',
+#                s = 100,
+#                c = scores,
+#                cmap = plt.get_cmap('rainbow')
+#                )
+        scat = map.scatter(x, y, marker = 'o', s = 20, c = 'r')
 
 #        plt.title('Verification score map')
 
@@ -217,3 +247,19 @@ def _make_plot(params):
     output['url'] = URL_PREFIX + '/' + file_name
 
     return output
+
+@CacheControl(time = 3600)
+def _query_db(query):
+    conn = None
+    cursor = None
+    try:
+        conn = psycopg2.connect('host=%s dbname=%s user=%s password=%s' %
+            (HOST, DB, USER, PASS))
+        cursor = conn.cursor()
+        cursor.execute(query)
+        return {'number_of_results': cursor.rowcount, 'data': cursor.fetchall()}
+    except psycopg2.DatabaseError, e:
+        return {'error': str(e)}
+    finally:
+        if cursor: cursor.close()
+        if conn: conn.close()
