@@ -22,20 +22,36 @@ $(function() {
     }
   });
 
-  getPlot({'plot_type': $('#verif_plot_type').val()});
+  getPlot({
+    'dataset'  : $('#verif_dataset').val(),
+    'plot_type': $('#verif_plot_type').val()
+  });
+
+  $('#verif_dataset').on('change', function() {
+    getPlot({
+      'dataset'  : $(this).val(),
+      'plot_type': $('#verif_plot_type').val()
+    });
+  });
 
   $('#verif_plot_type').on('change', function() {
-    getPlot({'plot_type': $(this).val()});
+    getPlot({
+      'dataset'  : $('#verif_dataset').val(),
+      'plot_type': $(this).val()
+      
+    });
   });
 
   function getPlot(params) {
 //    console.log(params);
+
     var msg = $('#verif_msg').text('');
     var img = $('#verif_img').attr('src', STATIC_URL + 'verif/images/loading.gif');
     var container = $('#verif_container').unbind();
     setContainerDimension(container, img);
 
-    var pt = params['plot_type'];
+//    var pt = $('#verif_plot_type').val();
+    var pt = params['plot_type']
 
     $.ajax({
       url: 'get-plot/',

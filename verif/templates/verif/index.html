@@ -15,13 +15,21 @@ Navigation menu
 {% endcomment %}
 <div id="leftColumn">
   <form>{% csrf_token %}
-    <select id="verif_plot_type" style="width:120px;">
-      <option value="mean_plot">Mean plot</option>
-      <option value="score_map" selected="selected">Score map</option>
-      <option value="time_series">Time series</option>
-      <option value="scatter_plot">Scatter plot</option>
-      <option value="histogram">Histogram</option>
-    </select>
+    <div>
+      <select id="verif_dataset" style="width:120px;">
+        <option value="emep">EMEP</option>
+        <option value="gaw" selected="selected">GAW</option>
+      </select>
+    </div>
+    <div>
+      <select id="verif_plot_type" style="width:120px;">
+        <option value="mean_plot">Mean plot</option>
+        <option value="score_map" selected="selected">Score map</option>
+        <option value="time_series">Time series</option>
+        <option value="scatter_plot">Scatter plot</option>
+        <option value="histogram">Histogram</option>
+      </select>
+    </div>
   </form>
 </div>
 
