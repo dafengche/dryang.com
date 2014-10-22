@@ -1,8 +1,9 @@
 from __future__ import absolute_import
 
-from celery import Celery
 import logging
 import time
+
+from celery import Celery
 
 logger = logging.getLogger(__name__)
 

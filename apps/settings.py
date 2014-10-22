@@ -51,6 +51,14 @@ MIDDLEWARE_CLASSES = (
     'common.broker.Broker',
 )
 
+# LDAP authN, 22OCT14
+AUTHENTICATION_BACKEND = (
+    'common.auth.backends.LDAPBackend',
+#    'django.contrib.auth.backends.ModelBackend',
+)
+LDAP_SERVER_URI = 'ldap://mw01'
+LDAP_BASE_DN = 'dc=dryang,dc=com'
+
 ROOT_URLCONF = 'apps.urls'
 
 WSGI_APPLICATION = 'apps.wsgi.application'
