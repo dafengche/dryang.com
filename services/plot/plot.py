@@ -63,7 +63,6 @@ def _make_plot(params):
     fig = plt.figure(figsize = (width, height))
     ax = fig.add_subplot(1, 1, 1) # Returns an Axes instance
 
-
     if 'mean_plot' == plot_type:
         x = np.linspace(-2, 2, 100)
 
@@ -99,23 +98,22 @@ def _make_plot(params):
         logger.debug('(sw_lat, sw_lon): (' + str(sw_lat) + ', ' + str(sw_lon) + ')')
         logger.debug('(ne_lat, ne_lon): (' + str(ne_lat) + ', ' + str(ne_lon) + ')')
 
-        # Query database to get station info
+        # Retrieve data from database
         query = None
         if dataset == 'emep':
             query = ('SELECT id, station_latitude_deg, station_longitude_deg '
                     'FROM gac_emep_stations')
         else: # GAW
             query = ('SELECT id, lat, lon FROM gac_gaw_stations')
-        stn_data = _query_db(query)
-        logger.debug(query)
-        logger.debug(str(stn_data['number_of_results']) + ' record(s) retrieved')
+        data = _query_db(query)
+        logger.debug(str(data['number_of_results']) + ' record(s) retrieved')
         stn_id_list = []
         stn_lat_list = []
         stn_lon_list = []
-        for stn in stn_data['data']:
-            stn_id_list.append(stn[0])
-            stn_lat_list.append(stn[1])
-            stn_lon_list.append(stn[2])
+        for d in data['data']:
+            stn_id_list.append(d[0])
+            stn_lat_list.append(d[1])
+            stn_lon_list.append(d[2])
 
 #        stn_lat_list = [47.8, -54.85, 47.0544, 44.18, 47.42, 46.55]
 #        stn_lon_list = [11.02, -68.32, 12.9583, 10.7, 10.98, 7.99]
@@ -152,21 +150,31 @@ def _make_plot(params):
 #        map.colorbar(scat, 'bottom', size = '5%', pad = '2%')
 #        ax.legend()
     elif 'time_series' == plot_type:
-        start_date = None
-        end_date = None
-        if 'start_date' in params:
-            start_date = params['start_date']
-        if 'end_date' in params:
-            end_date = params['end_date']
-        logger.debug('start_date: ' + str(start_date))
-        logger.debug('end_date: ' + str(end_date))
-
 #        x = np.array([datetime(2013, m, 20, 0, 0) for m in range(1, 13)])
 #        y = np.random.randint(100, size = x.shape)
-        x, y = np.loadtxt(OUTPUT_DIR + '/date-against-value.csv',
-                    unpack = True,
-                    converters = { 0: dates.strpdate2num('%Y-%m-%d') }
-                    )
+# You may load data from CSV files using np.loadtxt method
+#        x, y = np.loadtxt('/path/to/date-against-value.csv',
+#                    unpack = True,
+#                    converters = { 0: dates.strpdate2num('%Y-%m-%d') }
+#                    )
+
+        # Retrieve data from database
+        query = 'SELECT ddate, rate FROM boe_base_rate'
+        if 'start_date' in params and 'end_date' in params:
+            start_date = params['start_date']
+            end_date = params['end_date']
+            logger.debug('start_date: ' + str(start_date))
+            logger.debug('end_date: ' + str(end_date))
+            query += " WHERE ddate BETWEEN '" + start_date + "' AND '" + end_date + "'"
+        data = _query_db(query)
+        logger.debug(str(data['number_of_results']) + ' record(s) retrieved')
+
+        x = []
+        y = []
+        for d in data['data']:
+            x.append(d[0]) # ddate
+            y.append(d[1]) # rate
+
         ax.plot_date(x, y, fmt = 'r-', label = 'obs')
         ax.xaxis.set_major_formatter(dates.DateFormatter('%Y-%m-%d'))
         plt.xticks(rotation = 20)
@@ -250,6 +258,7 @@ def _make_plot(params):
 
 @CacheControl(time = 3600)
 def _query_db(query):
+    logger.debug(query)
     conn = None
     cursor = None
     try:
