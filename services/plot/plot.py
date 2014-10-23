@@ -175,7 +175,7 @@ def _make_plot(params):
             x.append(d[0]) # ddate
             y.append(d[1]) # rate
 
-        ax.plot_date(x, y, fmt = 'r-', label = 'obs')
+        ax.plot_date(x, y, fmt = 'r-', label = 'base rate')
         ax.xaxis.set_major_formatter(dates.DateFormatter('%Y-%m-%d'))
         plt.xticks(rotation = 20)
         ax.grid(True)
