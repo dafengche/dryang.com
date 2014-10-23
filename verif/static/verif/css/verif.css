@@ -1,35 +1,26 @@
-#leftColumn {
-  float: left;
-  margin: 0 2em 1em 0; /* top, right, bottom, left */
-  width: 10em;
-}
-
-#mainColumn {
-  float: left;
-}
-
 #verif_container {
   width              : 0px;
   height             : 0px;
-/*  background         : #ddd;
-  line-height        : 300px;
-  text-align         : center;
-  color              : #666;*/
   -moz-user-select   : none;
   -webkit-user-select: none;
   -ms-user-select    : none;
   user-select        : none;
-  z-index            : 1;
+  z-index            : 10;
 }
 
 #verif_img {
   left    : 0px;
   top     : 0px;
-  z-index : 2;
+  z-index : 11;
 }
 
 #verif_rect {
   position: absolute;
   border  : 1px dotted #000;
-  z-index : 3;
+  z-index : 12;
+}
+
+.verif_select {
+  width : 120px;
+  margin: 0.2em;
 }

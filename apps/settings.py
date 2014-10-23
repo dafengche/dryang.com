@@ -52,12 +52,12 @@ MIDDLEWARE_CLASSES = (
 )
 
 # LDAP authN, 22OCT14
-AUTHENTICATION_BACKEND = (
-    'common.auth.backends.LDAPBackend',
-#    'django.contrib.auth.backends.ModelBackend',
-)
-LDAP_SERVER_URI = 'ldap://mw01'
-LDAP_BASE_DN = 'dc=dryang,dc=com'
+#AUTHENTICATION_BACKEND = (
+#    'common.auth.backends.LDAPBackend',
+##    'django.contrib.auth.backends.ModelBackend',
+#)
+#LDAP_SERVER_URI = 'ldap://mw01'
+#LDAP_BASE_DN = 'dc=dryang,dc=com'
 
 ROOT_URLCONF = 'apps.urls'
 
@@ -92,6 +92,27 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# 23OCT14
+# List of additional locations for
+# django.contrib.staticfiles.finders.FileSystemFinder
+STATICFILES_DIRS = (
+    '/home/maxy/git/dev/dryang.com/common/media',
+)
+# Notice the default STATICFILES_FINDERS are
+# django.contrib.staticfiles.finders.FileSystemFinder and
+# django.contrib.staticfiles.finders.AppDirectoriesFinder
+
+# 23OCT14
+# List of locations of the template source files searched by
+# django.template.loaders.filesystem.loader, in search order
+TEMPLATE_DIRS = (
+    '/home/maxy/git/dev/dryang.com/common/templates',
+)
+# Notice the default TEMPLATE_LOADERS are
+# django.template.loaders.filesystem.Loader and
+# django.template.loaders.app_directories.Loader
+
 
 # Logging, 29SEP14
 LOGGING = {

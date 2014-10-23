@@ -1,42 +1,42 @@
-{% load staticfiles %}
+{% extends "base.html" %}
 
+{% block css_and_js %}
 <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}verif/css/verif.css'/>
-
 <script type='text/javascript' src='{{ STATIC_URL }}verif/js/jquery.min.js'></script>
 <script type='text/javascript' src='{{ STATIC_URL }}verif/js/verif.js'></script>
 <script type='text/javascript'>
   var STATIC_URL = '{{ STATIC_URL }}';
 </script>
-
-<h2>Verification App</h2>
+{% endblock %}
 
 {% comment %}
 Navigation menu
 {% endcomment %}
-<div id="leftColumn">
-  <form>{% csrf_token %}
-    <div>
-      <select id="verif_dataset" style="width:120px;">
-        <option value="emep">EMEP</option>
-        <option value="gaw" selected="selected">GAW</option>
-      </select>
-    </div>
-    <div>
-      <select id="verif_plot_type" style="width:120px;">
-        <option value="mean_plot">Mean plot</option>
-        <option value="score_map" selected="selected">Score map</option>
-        <option value="time_series">Time series</option>
-        <option value="scatter_plot">Scatter plot</option>
-        <option value="histogram">Histogram</option>
-      </select>
-    </div>
-  </form>
-</div>
+{% block nav%}
+<form>{% csrf_token %}
+  <div>
+    <select id="verif_dataset" class="verif_select"  style="width:120px;">
+      <option value="emep">EMEP</option>
+      <option value="gaw" selected="selected">GAW</option>
+    </select>
+  </div>
+  <div>
+    <select id="verif_plot_type" class="verif_select">
+      <option value="mean_plot">Mean plot</option>
+      <option value="score_map" selected="selected">Score map</option>
+      <option value="time_series">Time series</option>
+      <option value="scatter_plot">Scatter plot</option>
+      <option value="histogram">Histogram</option>
+    </select>
+  </div>
+</form>
+{% endblock %}
 
 {% comment %}
 Main body
 {% endcomment %}
-<div id="mainColumn">
-  <div id="verif_container"><img id="verif_img"></img></div>
-  <p id="verif_msg"></p>
-</div>
+{% block content %}
+<h2>Verification App</h2>
+<div id="verif_container"><img id="verif_img"></img></div>
+<div><p id="verif_msg"></p></div>
+{% endblock %}

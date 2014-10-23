@@ -1,0 +1,21 @@
+#container {
+}
+
+#header { /* container -> header */
+}
+
+#footer { /* container -> footer */
+}
+
+#main { /* container -> main */
+}
+
+#nav { /* container -> main -> nav */
+  float : left;
+  margin: 0 2em 1em 0; /* top, right, bottom, left */
+  width : 10em;
+}
+
+#content { /* container -> main -> content */
+  float: left;
+}
