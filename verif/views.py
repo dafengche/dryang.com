@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def index(request):
-    return render(request, 'verif/index.html', {'title': 'Demo - verification', 'login_url': '/login/', 'logout_url': '/logout/'})
+    return render(request, 'verif/index.html', {'title': 'Verification'})
 
 def get_plot(request):
     if request.is_ajax():

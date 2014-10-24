@@ -97,7 +97,7 @@ STATIC_URL = '/static/'
 # List of additional locations for
 # django.contrib.staticfiles.finders.FileSystemFinder
 STATICFILES_DIRS = (
-    '/home/maxy/git/dev/dryang.com/common/media',
+    '/home/maxy/git/dev/dryang.com/common/static',
 )
 # Notice the default STATICFILES_FINDERS are
 # django.contrib.staticfiles.finders.FileSystemFinder and
