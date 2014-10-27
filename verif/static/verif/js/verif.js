@@ -48,7 +48,7 @@ $(function() {
     var msg = $('#verif_msg').text('');
     var img = $('#verif_img').attr('src', STATIC_URL + 'verif/images/loading.gif');
     var container = $('#verif_container').unbind();
-    setContainerDimension(container, img);
+//    setContainerDimension(container, img);
 
 //    var pt = $('#verif_plot_type').val();
     var pt = params['plot_type']
@@ -62,11 +62,11 @@ $(function() {
         if (result['error']) {
 //          msg.text(result['error']);
           img.attr('src', STATIC_URL + 'verif/images/failed.jpg');
-          setContainerDimension(container, img);
+//          setContainerDimension(container, img);
           return;
         }
         img.attr('src', result['result']['url']);
-        setContainerDimension(container, img);
+//        setContainerDimension(container, img);
 
         if ('time_series' != pt && 'score_map' != pt) {
           return;
@@ -168,7 +168,7 @@ $(function() {
       error: function(result) {
 //        msg.text(result['error']);
         img.attr('src', '{{ STATIC_URL }}verif/images/failed.jpg');
-        setContainerDimension(container, img);
+//        setContainerDimension(container, img);
       }
     });
   }
