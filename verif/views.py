@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 
+from django.contrib.auth.decorators import login_required
+from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -8,9 +10,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+@login_required(login_url = reverse_lazy('dryang-auth:login'))
 def index(request):
     return render(request, 'verif/index.html', {'title': 'Verification'})
 
+@login_required(login_url = reverse_lazy('dryang-auth:login'))
 def get_plot(request):
     if request.is_ajax():
         if request.method == 'POST':

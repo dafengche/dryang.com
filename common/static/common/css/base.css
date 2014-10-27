@@ -39,8 +39,9 @@ html, body {
   margin-left: 10em; /* Width of nav */
 }
 
-#header p {
-  margin: 0;
+#user p {
+  margin    : 0;
+  text-align: right;
 }
 
 #footer p {

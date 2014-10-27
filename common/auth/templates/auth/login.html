@@ -1,0 +1,22 @@
+{% extends "common/base.html" %}
+
+{% block main %}
+{% comment %}
+<form method='post' action="{% url 'dryang-auth:login' %}">{% csrf_token %}
+{% endcomment %}
+<form method='post' action="">{% csrf_token %}
+{{ msg }}
+<table>
+  <tr>
+    <td>Username:</td>
+    <td><input type='text' id='username' name='username'/></td>
+  </tr>
+  <tr>
+    <td>Password:</td>
+    <td><input type='password' id='password' name='password'/></td>
+  </tr>
+</table>
+
+<input type='submit' value='login'/>
+</form>
+{% endblock %}

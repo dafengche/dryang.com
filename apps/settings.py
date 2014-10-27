@@ -36,6 +36,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'common.auth.apps.AuthConfig',
     'demo',
     'verif',
 )
@@ -50,14 +52,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'common.broker.Broker',
 )
-
-# LDAP authN, 22OCT14
-#AUTHENTICATION_BACKEND = (
-#    'common.auth.backends.LDAPBackend',
-##    'django.contrib.auth.backends.ModelBackend',
-#)
-#LDAP_SERVER_URI = 'ldap://mw01'
-#LDAP_BASE_DN = 'dc=dryang,dc=com'
 
 ROOT_URLCONF = 'apps.urls'
 
@@ -155,8 +149,14 @@ LOGGING = {
             'handlers': ['console'],
             'level': 'DEBUG',
         },
+        'common.auth': {
+#            'handlers': ['console', 'file'],
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
     }
 }
+
 
 # Celery, 30SEP14
 BROKER_URL = 'amqp://mw01/'
@@ -166,3 +166,23 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 
+
+# AuthN, 22OCT14
+#AUTHENTICATION_BACKEND = (
+#    'common.auth.backends.LDAPBackend',
+##    'django.contrib.auth.backends.ModelBackend',
+#)
+#LDAP_SERVER_URI = 'ldap://mw01'
+#LDAP_BASE_DN = 'dc=dryang,dc=com'
+
+# AuthN related URLs
+# LOGIN_REDIRECT_URL default: /accounts/profile/
+# LOGIN_URL          default: /accounts/login/
+# LOGOUT_URL         default: /accounts/logout/
+
+# Make every RequestContext contain a variable "request", which is the current
+# HttpRequest, 27OCT14
+from django.conf import global_settings
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+    'django.core.context_processors.request',
+)

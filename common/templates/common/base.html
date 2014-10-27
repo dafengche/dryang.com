@@ -16,17 +16,19 @@
   <body>
     <div id="container">
       <div id="header">
-        <p>
-          {% if not user.is_authenticated %}
-          <a href="/login/">Log in</a>
-          {% else %}
-          <strong>{{ user.first_name }} {{ user.last_name }}</strong> | <a href="/logout/">Log out</a>
-          {% endif %}
-        </p>
+        <div id="user">
+          <p>
+            {% if not user.is_authenticated %}
+            <a href="{% url 'dryang-auth:login' %}?next={% firstof request.path '/' %}">Log in</a>
+            {% else %}
+            <strong>{{ user.first_name }} {{ user.last_name }}</strong> | <a href="{% url 'dryang-auth:logout' %}">Log out</a>
+            {% endif %}
+          </p>
+        </div>
       </div>
       <div id="content">
         <div id="nav">{% block nav %}{% endblock %}</div>
-        <div id="main">{% block content %}{% endblock %}</div>
+        <div id="main">{% block main %}{% endblock %}</div>
       </div>
       <div id="footer">
         <p>&copy; 2014 by dryang.com. All Rights Reserved.</p>
