@@ -13,6 +13,11 @@ html, body {
 
 #header { /* container -> header */
   background-color: #D8D8D8;
+  margin          : 0;
+}
+
+#content { /* container -> content */
+  padding-bottom: 2em; /* Heighter of footer */
 }
 
 #footer { /* container -> footer */
@@ -21,19 +26,25 @@ html, body {
   bottom          : 0;
   height          : 2em;
   width           : 100%;
-  text-align      : center;
 }
 
-#main { /* container -> main */
-  padding-bottom: 2em; /* Heighter of the footer */
-}
-
-#nav { /* container -> main -> nav */
+#nav { /* container -> content -> nav */
   float : left;
-  margin: 0 2em 1em 0; /* top right bottom left */
+  margin: 0 2em 0 0; /* top right bottom left */
   width : 10em;
+  height: 100%;
 }
 
-#content { /* container -> main -> content */
-  float: left;
+#main { /* container -> content -> main */
+  margin-left: 10em; /* Width of nav */
+}
+
+#header p {
+  margin: 0;
+}
+
+#footer p {
+  margin    : 0;
+  padding   : 0.5em 0 0 0;
+  text-align: center;
 }

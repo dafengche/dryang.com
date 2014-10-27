@@ -5,26 +5,31 @@
     <title>{{ title|default:'dryang.com' }}</title>
     <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}/common/css/base.css'/>
     {% block css_and_js %}{% endblock %}
+    <!--[if lt IE7]>
+    <style type="text/css">
+      #container {
+        height: 100%;
+      }
+    </style>
+    <![endif]-->
   </head>
   <body>
     <div id="container">
       <div id="header">
-        <div id="authn">
-          <p>
-            {% if not user.is_authenticated %}
-            <a href="/login/">Log in</a>
-            {% else %}
-            <strong>{{ user.first_name }} {{ user.last_name }}</strong> | <a href="/logout/">Log out</a>
-            {% endif %}
-          </p>
-        </div>
+        <p>
+          {% if not user.is_authenticated %}
+          <a href="/login/">Log in</a>
+          {% else %}
+          <strong>{{ user.first_name }} {{ user.last_name }}</strong> | <a href="/logout/">Log out</a>
+          {% endif %}
+        </p>
       </div>
-      <div id="main">
+      <div id="content">
         <div id="nav">{% block nav %}{% endblock %}</div>
-        <div id="content">{% block content %}{% endblock %}</div>
+        <div id="main">{% block content %}{% endblock %}</div>
       </div>
       <div id="footer">
-        <p>Copyright 2014 by dryang.com. All Rights Reserved.</p>
+        <p>&copy; 2014 by dryang.com. All Rights Reserved.</p>
       </div>
     </div>
   </body>
