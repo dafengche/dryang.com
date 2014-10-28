@@ -59,13 +59,13 @@ $(function() {
   function getPlot(params) {
 //    console.log(params);
 
-    var msg = $('#verif_msg').text('');
-    var img = $('#verif_img').attr('src', STATIC_URL + 'verif/images/loading.gif');
     var container = $('#verif_container').unbind();
-//    setContainerDimension(container, img);
-
-//    var pt = $('#verif_plot_type').val();
-    var pt = params['plot_type']
+    var msg = $('#verif_msg').text('');
+    var img = $('#verif_img')
+      .attr('src', STATIC_URL + 'verif/images/loading.gif')
+      .load(function() {
+        setContainerDimension(container, this.width, this.height)
+      });
 
     $.ajax({
       url: 'get-plot/',
@@ -76,13 +76,18 @@ $(function() {
         $('#verif_plot_btn').removeAttr('disabled');
         if (result['error']) {
 //          msg.text(result['error']);
-          img.attr('src', STATIC_URL + 'verif/images/failed.jpg');
-//          setContainerDimension(container, img);
+          img.attr('src', STATIC_URL + 'verif/images/failed.jpg')
+            .load(function() {
+              setContainerDimension(container, this.width, this.height)
+            });
           return;
         }
-        img.attr('src', result['result']['url']);
-//        setContainerDimension(container, img);
+        img.attr('src', result['result']['url'])
+          .load(function() {
+            setContainerDimension(container, this.width, this.height)
+          });
 
+        var pt = params['plot_type'];
         if ('time_series' != pt && 'score_map' != pt) {
           return;
         }
@@ -113,12 +118,13 @@ $(function() {
           rect.css({
             'top'   : startY + 'px',
             'left'  : startX + 'px',
-            'width' : '0px',
-            'height': '0px'
+            'width' : '0',
+            'height': '0'
           });
           rect.appendTo(container);
 
           var offset = $(this).offset();
+//          console.log('offset.left: ' + offset.left + ', offset.top: ' + offset.top);
           var xy = getXY(startX - offset.left, startY - offset.top, md);
           x1 = xy[0], y1 = xy[1];
 //          console.log('-> (' + x1 + ', ' + y1 + ')');
@@ -150,6 +156,7 @@ $(function() {
           rect.remove();
 
           var offset = $(this).offset();
+//          console.log('offset.left: ' + offset.left + ', offset.top: ' + offset.top);
           var xy = getXY(endX - offset.left, endY - offset.top, md);
           x2 = xy[0], y2 = xy[1];
 //          console.log('-> (' + x2 + ', ' + y2 + ')');
@@ -172,8 +179,8 @@ $(function() {
             params['sw_lat'] = y1;
             params['ne_lon'] = x2;
             params['ne_lat'] = y2;
-            console.log('Area selected: sw(' + x1 + ', ' + y1 + '), ne('
-              + x2 + ', ' + y2 + ')');
+//            console.log('Area selected: sw(' + x1 + ', ' + y1 + '), ne('
+//              + x2 + ', ' + y2 + ')');
           }
 
           $('#verif_plot_btn').attr('disabled', 'disabled');
@@ -185,8 +192,10 @@ $(function() {
       error: function(result) {
         $('#verif_plot_btn').removeAttr('disabled');
 //        msg.text(result['error']);
-        img.attr('src', '{{ STATIC_URL }}verif/images/failed.jpg');
-//        setContainerDimension(container, img);
+        img.attr('src', '{{ STATIC_URL }}verif/images/failed.jpg')
+          .load(function() {
+            setContainerDimension(container, this.width, this.height)
+          });
       }
     });
   }
@@ -215,10 +224,11 @@ $(function() {
     return [x, y];
   }
 
-  function setContainerDimension(container, img) {
+  function setContainerDimension(container, width, height) {
+//    console.log('Set container width and height to ' + width + ', ' + height);
     container.css({
-      'width' : img.width(),
-      'height': img.height()
+      'width' : width,
+      'height': height
     });
   }
 
