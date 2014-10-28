@@ -15,12 +15,16 @@ Navigation menu
 {% block nav%}
 <form>{% csrf_token %}
   <div>
+    <b>Dataset:</b>
     <select id="verif_dataset" class="verif_select"  style="width:120px;">
+      <option value="boe" selected="selected">Bank of England</option>
       <option value="emep">EMEP</option>
-      <option value="gaw" selected="selected">GAW</option>
+      <option value="gaw">GAW</option>
     </select>
   </div>
-  <div>
+  <div id="verif_plot_type_block" style="display:none;">
+    <br/>
+    <b>Type of plot:</b>
     <select id="verif_plot_type" class="verif_select">
       <option value="mean_plot">Mean plot</option>
       <option value="score_map" selected="selected">Score map</option>
@@ -28,6 +32,10 @@ Navigation menu
       <option value="scatter_plot">Scatter plot</option>
       <option value="histogram">Histogram</option>
     </select>
+  </div>
+  <div>
+    <br/>
+    <input id="verif_plot_btn" type="submit" value="Plot"/>
   </div>
 </form>
 {% endblock %}

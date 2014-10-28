@@ -22,18 +22,14 @@ $(function() {
     }
   });
 
-  getPlot({
-    'dataset'  : $('#verif_dataset').val(),
-    'plot_type': $('#verif_plot_type').val()
-  });
-
   $('#verif_dataset').on('change', function() {
-    getPlot({
-      'dataset'  : $(this).val(),
-      'plot_type': $('#verif_plot_type').val()
-    });
+    var dataset = $(this).val();
+    if (dataset == 'boe')
+      $('#verif_plot_type_block').hide();
+    else
+      $('#verif_plot_type_block').show();
   });
-
+/*
   $('#verif_plot_type').on('change', function() {
     getPlot({
       'dataset'  : $('#verif_dataset').val(),
@@ -41,7 +37,25 @@ $(function() {
       
     });
   });
+*/
 
+  $('#verif_plot_btn').on('click', function(e) {
+    e.preventDefault();
+
+    $(this).attr('disabled', 'disabled');
+
+    var dataset = $('#verif_dataset').val();
+    var pt = 'time_series';
+    if ('boe' != dataset) {
+      pt = $('#verif_plot_type').val();
+    }
+    getPlot({
+      'dataset'  : dataset,
+      'plot_type': pt
+    });
+  });
+
+  // params must contain dataset and plot_type
   function getPlot(params) {
 //    console.log(params);
 
@@ -59,6 +73,7 @@ $(function() {
       dataType: 'json',
       data: JSON.stringify(params),
       success: function(result) {
+        $('#verif_plot_btn').removeAttr('disabled');
         if (result['error']) {
 //          msg.text(result['error']);
           img.attr('src', STATIC_URL + 'verif/images/failed.jpg');
@@ -161,11 +176,14 @@ $(function() {
               + x2 + ', ' + y2 + ')');
           }
 
+          $('#verif_plot_btn').attr('disabled', 'disabled');
+
           // Request a updated plot
           getPlot(params);
         });
       },
       error: function(result) {
+        $('#verif_plot_btn').removeAttr('disabled');
 //        msg.text(result['error']);
         img.attr('src', '{{ STATIC_URL }}verif/images/failed.jpg');
 //        setContainerDimension(container, img);
