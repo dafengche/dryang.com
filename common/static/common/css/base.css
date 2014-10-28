@@ -31,12 +31,12 @@ html, body {
 #nav { /* container -> content -> nav */
   float : left;
   margin: 0 2em 0 0; /* top right bottom left */
-  width : 10em;
+  width : 12em;
   height: 100%;
 }
 
 #main { /* container -> content -> main */
-  margin-left: 10em; /* Width of nav */
+  margin-left: 12em; /* Width of nav */
 }
 
 #user p {
