@@ -40,13 +40,16 @@ def make_plot_mpl(params):
 
 @CacheControl(time = 600)
 def _make_plot(params):
+    dataset = params['dataset']
+    if dataset not in ['boe', 'emep', 'gaw']:
+        return {'error': 'Unsupported dataset: ' + dataset}
+
     plot_type = params['plot_type']
     if plot_type not in ['histogram', 'mean_plot', 'scatter_plot', 'score_map', 'time_series']:
         return {'error': 'Unsupported plot type: ' + plot_type}
 
-    dataset = params['dataset']
-    if dataset not in ['emep', 'gaw']:
-        return {'error': 'Unsupported dataset: ' + dataset}
+    if dataset == 'boe' and plot_type != 'time_series':
+        return {'error': 'Unsupported plot type for dataset boe: ' + plot_type}
 
     # Plot, default size: 660x480px, 100dpi
     DPI = 100
