@@ -25,11 +25,12 @@ def query_db(query):
         cursor = conn.cursor()
         cursor.execute(query)
         result = {'number_of_results': cursor.rowcount, 'data': cursor.fetchall()}
-        logger.debug(str(result['number_of_results']) + ' record(s) found')
+        logger.debug(result)
         return result
     except psycopg2.DatabaseError, e:
-        logger.warning('Database query failed - ' + str(e))
-        return {'error': str(e)}
+        logger.warning('Database query failed - ' + query)
+        logger.warning(str(e))
+        return {'error': 'Database query failed'}
     finally:
         if cursor: cursor.close()
         if conn: conn.close()

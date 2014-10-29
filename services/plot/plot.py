@@ -104,6 +104,7 @@ def _make_plot(params):
         else: # GAW
             query = ('SELECT id, lat, lon FROM gac_gaw_stations')
         data = query_db(query)
+        if 'error' in data: return data
         logger.debug(str(data['number_of_results']) + ' record(s) retrieved')
         stn_id_list = []
         stn_lat_list = []
@@ -165,6 +166,7 @@ def _make_plot(params):
             logger.debug('end_date: ' + str(end_date))
             query += " WHERE ddate BETWEEN '" + start_date + "' AND '" + end_date + "'"
         data = query_db(query)
+        if 'error' in data: return data
         logger.debug(str(data['number_of_results']) + ' record(s) retrieved')
 
         x = []
