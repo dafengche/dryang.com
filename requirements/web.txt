@@ -1,0 +1,8 @@
+# python-memcached is for test purpose
+#
+celery
+Django
+pika
+python-ldap
+python-memcached
+redis
