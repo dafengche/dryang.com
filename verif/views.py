@@ -25,7 +25,23 @@ def get_plot(request):
             try:
                 result  = request.broker.execute('services.plot.plot.make_plot_mpl', *args, **kwargs)
                 logger.debug('Result: ' + str(result))
-                return HttpResponse(json.dumps(result), content_type = 'application/json')
+                return HttpResponse(json.dumps(result['result']), content_type = 'application/json')
+            except Exception as ex:
+                logger.error(ex)
+                return HttpResponse(json.dumps({'error': 'Request failed!'}), content_type = 'application/json')
+
+@login_required(login_url = reverse_lazy('dryang-auth:login'))
+def get_stations(request):
+    if request.is_ajax():
+        if request.method == 'POST':
+            params = json.loads(request.body)
+            logger.debug('Parameters: ' + str(params))
+            args = [params]
+            kwargs = {}
+            try:
+                result  = request.broker.execute('services.station.station.get_stations', *args, **kwargs)
+                logger.debug('Result: ' + str(result))
+                return HttpResponse(json.dumps(result['result']), content_type = 'application/json')
             except Exception as ex:
                 logger.error(ex)
                 return HttpResponse(json.dumps({'error': 'Request failed!'}), content_type = 'application/json')

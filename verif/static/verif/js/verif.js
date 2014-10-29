@@ -7,7 +7,7 @@ $(function() {
           var cookies = document.cookie.split(';');
           for (var i = 0; i < cookies.length; i++) {
             var cookie = jQuery.trim(cookies[i]);
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
               cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
               break;
             }
@@ -24,10 +24,16 @@ $(function() {
 
   $('#verif_dataset').on('change', function() {
     var dataset = $(this).val();
-    if (dataset == 'boe')
+    if (dataset === 'boe')
       $('#verif_plot_type_block').hide();
     else
       $('#verif_plot_type_block').show();
+
+    if (dataset === 'emep')
+      $('#verif_stn_finder').stationFinder({'dataset': dataset});
+    else
+      if ($('#verif_stn_finder').hasClass('station-finder'))
+        $('#verif_stn_finder').stationFinder('destroy');
   });
 /*
   $('#verif_plot_type').on('change', function() {
@@ -82,7 +88,7 @@ $(function() {
             });
           return;
         }
-        img.attr('src', result['result']['url'])
+        img.attr('src', result['url'])
           .load(function() {
             setContainerDimension(container, this.width, this.height)
           });
@@ -93,8 +99,8 @@ $(function() {
         }
 
         // Zoom
-        var md = result['result']['metadata'];
-        if ('time_series' == pt) { // YYYY-MM-DD -> milliseconds since 1970/01/01
+        var md = result['metadata'];
+        if ('time_series' === pt) { // YYYY-MM-DD -> milliseconds since 1970/01/01
           md['x_min'] = new Date(md['x_min']).getTime();
           md['x_max'] = new Date(md['x_max']).getTime();
         }
@@ -168,7 +174,7 @@ $(function() {
           x2 = x2 > md['x_max'] ? md['x_max'] : x2;
           y2 = y2 > md['y_max'] ? md['y_max'] : y2;
 
-          if ('time_series' == pt) {
+          if ('time_series' === pt) {
             x1 = new Date(x1);
             x2 = new Date(x2);
             params['start_date'] = x1;

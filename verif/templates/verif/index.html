@@ -3,8 +3,10 @@
 {% block css_and_js %}
 <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}common/jquery-ui-1.11.2/jquery-ui.min.css'/>
 <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}verif/css/verif.css'/>
+<link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}verif/widgets/station-finder/station-finder.css'/>
 <script type='text/javascript' src='{{ STATIC_URL }}common/jquery-ui-1.11.2/jquery-ui.min.js'></script>
 <script type='text/javascript' src='{{ STATIC_URL }}verif/js/verif.js'></script>
+<script type='text/javascript' src='{{ STATIC_URL }}verif/widgets/station-finder/station-finder.js'></script>
 {% endblock %}
 
 {% comment %}
@@ -20,6 +22,7 @@ Navigation menu
       <option value="gaw">GAW</option>
     </select>
   </div>
+  <div id="verif_stn_finder"></div>
   <div id="verif_plot_type_block" style="display:none;">
     <br/>
     <b>Type of plot:</b>
