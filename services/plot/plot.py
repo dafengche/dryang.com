@@ -9,7 +9,6 @@ import matplotlib.lines as lines
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-import psycopg2
 import pytz
 import socket
 
@@ -18,6 +17,7 @@ from mpl_toolkits.basemap import Basemap
 
 from services.celery import app
 from services.servicelib.cache import CacheControl
+from services.servicelib.db import query_db
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
@@ -25,11 +25,6 @@ logger.setLevel(logging.DEBUG)
 
 OUTPUT_DIR = '/var/share/download_data'
 URL_PREFIX = 'http://web01:8008'
-
-HOST = 'db01'
-DB = 'verif'
-USER = 'verif'
-PASS = 'verif'
 
 @app.task
 def make_plot_mpl(params):
@@ -108,7 +103,7 @@ def _make_plot(params):
                     'FROM gac_emep_stations')
         else: # GAW
             query = ('SELECT id, lat, lon FROM gac_gaw_stations')
-        data = _query_db(query)
+        data = query_db(query)
         logger.debug(str(data['number_of_results']) + ' record(s) retrieved')
         stn_id_list = []
         stn_lat_list = []
@@ -169,7 +164,7 @@ def _make_plot(params):
             logger.debug('start_date: ' + str(start_date))
             logger.debug('end_date: ' + str(end_date))
             query += " WHERE ddate BETWEEN '" + start_date + "' AND '" + end_date + "'"
-        data = _query_db(query)
+        data = query_db(query)
         logger.debug(str(data['number_of_results']) + ' record(s) retrieved')
 
         x = []
@@ -258,20 +253,3 @@ def _make_plot(params):
     output['url'] = URL_PREFIX + '/' + file_name
 
     return output
-
-@CacheControl(time = 3600)
-def _query_db(query):
-    logger.debug(query)
-    conn = None
-    cursor = None
-    try:
-        conn = psycopg2.connect('host=%s dbname=%s user=%s password=%s' %
-            (HOST, DB, USER, PASS))
-        cursor = conn.cursor()
-        cursor.execute(query)
-        return {'number_of_results': cursor.rowcount, 'data': cursor.fetchall()}
-    except psycopg2.DatabaseError, e:
-        return {'error': str(e)}
-    finally:
-        if cursor: cursor.close()
-        if conn: conn.close()

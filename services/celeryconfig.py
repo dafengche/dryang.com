@@ -7,6 +7,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_INCLUDE = [
     'services.compute.compute',
     'services.plot.plot',
+    'services.station.station',
 ]
 '''
 # Routing config
