@@ -3,7 +3,11 @@
 <html>
   <head>
     <title>{{ title|default:'dryang.com' }}</title>
-    <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}/common/css/base.css'/>
+    <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}common/css/base.css'/>
+    <script type='text/javascript' src='{{ STATIC_URL }}common/js/jquery-1.11.1.min.js'></script>
+    <script type='text/javascript'>
+      var STATIC_URL = '{{ STATIC_URL }}';
+    </script>
     {% block css_and_js %}{% endblock %}
     <!--[if lt IE7]>
     <style type="text/css">
