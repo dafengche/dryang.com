@@ -1,7 +1,9 @@
 {% extends "common/base.html" %}
 
 {% block css_and_js %}
+<link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}common/jquery-ui-1.11.2/jquery-ui.min.css'/>
 <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}verif/css/verif.css'/>
+<script type='text/javascript' src='{{ STATIC_URL }}common/jquery-ui-1.11.2/jquery-ui.min.js'></script>
 <script type='text/javascript' src='{{ STATIC_URL }}verif/js/verif.js'></script>
 {% endblock %}
 
