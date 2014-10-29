@@ -29,7 +29,7 @@ def query_db(query):
         return result
     except psycopg2.DatabaseError, e:
         logger.warning('Database query failed - ' + str(e))
-        return {'error': str(e)}
+        return {'error': 'Database query failed'}
     finally:
         if cursor: cursor.close()
         if conn: conn.close()
