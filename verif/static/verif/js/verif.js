@@ -62,7 +62,7 @@ $(function() {
     var container = $('#verif_container').unbind();
     var msg = $('#verif_msg').text('');
     var img = $('#verif_img')
-      .attr('src', STATIC_URL + 'verif/images/loading.gif')
+      .attr('src', STATIC_URL + 'common/images/loading.gif')
       .load(function() {
         setContainerDimension(container, this.width, this.height)
       });
@@ -76,7 +76,7 @@ $(function() {
         $('#verif_plot_btn').removeAttr('disabled');
         if (result['error']) {
 //          msg.text(result['error']);
-          img.attr('src', STATIC_URL + 'verif/images/failed.jpg')
+          img.attr('src', STATIC_URL + 'common/images/failed.jpg')
             .load(function() {
               setContainerDimension(container, this.width, this.height)
             });
@@ -192,7 +192,7 @@ $(function() {
       error: function(result) {
         $('#verif_plot_btn').removeAttr('disabled');
 //        msg.text(result['error']);
-        img.attr('src', '{{ STATIC_URL }}verif/images/failed.jpg')
+        img.attr('src', '{{ STATIC_URL }}common/images/failed.jpg')
           .load(function() {
             setContainerDimension(container, this.width, this.height)
           });

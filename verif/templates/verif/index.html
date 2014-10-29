@@ -2,11 +2,7 @@
 
 {% block css_and_js %}
 <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}verif/css/verif.css'/>
-<script type='text/javascript' src='{{ STATIC_URL }}verif/js/jquery.min.js'></script>
 <script type='text/javascript' src='{{ STATIC_URL }}verif/js/verif.js'></script>
-<script type='text/javascript'>
-  var STATIC_URL = '{{ STATIC_URL }}';
-</script>
 {% endblock %}
 
 {% comment %}
@@ -45,6 +41,6 @@ Main body
 {% endcomment %}
 {% block main %}
 <h2>Verification App</h2>
-<div id="verif_container"><img id="verif_img"></img></div>
+<div id="verif_container"><img id="verif_img"/></div>
 <div><p id="verif_msg"></p></div>
 {% endblock %}
