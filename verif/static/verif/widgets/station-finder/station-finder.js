@@ -19,17 +19,17 @@
       el.addClass('station-finder');
       dlg = $('<div></div>').appendTo(el);
       var ajaxCounter = 0, ajaxCompletedCounter = 0;
-      var timer = undefined;
+      var timer = null;
       $('<input type="text"/>').focus().unbind().on('keyup', function(e) {
         e.preventDefault();
 
         var name = $.trim($(this).val());
         if (name.length >= 3) {
-          if (timer != undefined)
+          if (timer != null)
             window.clearTimeout(timer);
-          timer = window.setTimeout(function() {console.log(name)} ,1000);
-
-          ajaxCounter = ajaxCounter + 1;
+          timer = window.setTimeout(function() {
+            timer = null;
+          ajaxCounter += 1;
           $('.station-finder-info').remove();
           $('.station-finder-loading').remove();
 //          $('.station-finder-list').remove();
@@ -54,15 +54,6 @@
                   $('<p class="station-finder-info">Found ' + result['number_of_results'] + ' station(s)</p>').appendTo(dlg);
                   console.log('Sending event station-finder-station-list...');
                   $(document).trigger('station-finder-station-list', [result['data']]);
-/*
-                  var sel = $('<select class="station-finder-list"></select>');
-                  var optionsAsString = '';
-                  $.each(result['data'], function(k, v) {
-//                    console.log(v[0] + ', ' + v[1] + ', ' + v[2] + ', (' + v[3] + ', ' + v[4] + ')');
-                    optionsAsString += '<option value="' + v[0] + '">' + v[1] + '</option>';
-                  });
-                  sel.append(optionsAsString).appendTo(dlg);
-*/
 //                  setTimeout(function() {dlg.dialog('close')}, 2000);
                 }
               } else {
@@ -81,9 +72,10 @@
             },
             complete: function() {
 //              console.log('complete');
-              ajaxCompletedCounter = ajaxCompletedCounter + 1;
+              ajaxCompletedCounter += 1;
             }
           });
+          }, 800);
         }
       }).appendTo(dlg);
       dlg.dialog({
