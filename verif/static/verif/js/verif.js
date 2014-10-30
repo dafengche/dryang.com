@@ -22,6 +22,13 @@ $(function() {
     }
   });
 
+  $(document).bind('station-finder-station-list', function(e, data) {
+    console.log('Received event station-finder-station-list');
+    $.each(data, function(k, v) {
+      console.log(v[0] + ', ' + v[1] + ', ' + v[2] + ', (' + v[3] + ', ' + v[4] + ')');
+    });
+  });
+
   $('#verif_dataset').on('change', function() {
     var dataset = $(this).val();
     if (dataset === 'boe')
