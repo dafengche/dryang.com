@@ -8,7 +8,10 @@ from services.station.station import get_stations
 # instance, which can be used to check the state of the task, wait for the task
 # to finish or get its returned value (or if the task failed, the exception and
 # traceback)
-result = get_stations.delay({'dataset': 'emep', 'name': 'her'})
+result = get_stations.delay({'dataset': 'emep'})
+#result = get_stations.delay({'dataset': 'emep', 'name': 'her'})
+#result = get_stations.delay({'dataset': 'gaw'})
+#result = get_stations.delay({'dataset': 'gaw', 'name': 'mo'})
 
 counter = 0
 while counter < 3:

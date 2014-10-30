@@ -17,23 +17,30 @@ def get_stations(params):
 
     if 'dataset' not in params.keys() or not params['dataset']:
         return {'error': 'Dataset not provided'}
-    if 'name' not in params.keys() or not params['name']:
-        return {'error': 'Station name not provided'}
-
     dataset = params['dataset']
-    if dataset not in ['emep']:
+    if dataset not in ['emep', 'gaw']:
         return {'error': 'Unsupported dataset: ' + dataset}
-    name = params['name']
+
+    if dataset == 'emep' and ('name' not in params.keys() or not params['name']):
+        return {'error': 'Station name required for dataset ' + dataset}
 
     # Retrieve data from database
     query = None
-    if dataset == 'emep':
-        query = ('SELECT id, station_name, station_city, '
+    if dataset == 'emep': # dataset and name are available
+        query = ('SELECT id, station_name, '
                 'station_latitude_deg, station_longitude_deg '
-                'FROM gac_emep_stations '
+                'FROM gac_%(dataset)s_stations '
                 "WHERE UPPER(station_name) LIKE UPPER('%(name)s%%') "
                 "OR UPPER(station_city) LIKE UPPER('%(name)s%%')"
                 % params)
-    else:
-        pass
+    else: # gaw: dataset available, name may not be available
+        if 'name' not in params.keys() or not params['name']:
+            query = ('SELECT id, name, lat, lon '
+                'FROM gac_%(dataset)s_stations'
+                % params)
+        else:
+            query = ('SELECT id, name, lat, lon '
+                'FROM gac_%(dataset)s_stations '
+                "WHERE UPPER(name) LIKE UPPER('%(name)s%%')"
+                % params)
     return query_db(query)
