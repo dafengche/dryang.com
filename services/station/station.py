@@ -28,10 +28,12 @@ def get_stations(params):
     # Retrieve data from database
     query = None
     if dataset == 'emep':
-        query = ('SELECT id, station_name, station_city FROM '
-                'gac_emep_stations WHERE UPPER(station_name) LIKE '
-                "UPPER('%(name)s%%') OR UPPER(station_city) LIKE "
-                "UPPER('%(name)s%%') " % params)
+        query = ('SELECT id, station_name, station_city, '
+                'station_latitude_deg, station_longitude_deg '
+                'FROM gac_emep_stations '
+                "WHERE UPPER(station_name) LIKE UPPER('%(name)s%%') "
+                "OR UPPER(station_city) LIKE UPPER('%(name)s%%')"
+                % params)
     else:
         pass
     return query_db(query)
