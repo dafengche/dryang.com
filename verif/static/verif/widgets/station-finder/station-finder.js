@@ -19,10 +19,16 @@
       el.addClass('station-finder');
       dlg = $('<div></div>').appendTo(el);
       var ajaxCounter = 0, ajaxCompletedCounter = 0;
+      var timer = undefined;
       $('<input type="text"/>').focus().unbind().on('keyup', function(e) {
         e.preventDefault();
+
         var name = $.trim($(this).val());
         if (name.length >= 3) {
+          if (timer != undefined)
+            window.clearTimeout(timer);
+          timer = window.setTimeout(function() {console.log(name)} ,1000);
+
           ajaxCounter = ajaxCounter + 1;
           $('.station-finder-info').remove();
           $('.station-finder-loading').remove();
