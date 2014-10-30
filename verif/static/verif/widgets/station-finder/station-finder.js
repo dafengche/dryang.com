@@ -1,4 +1,6 @@
 (function($) {
+  var dlg;
+
   $.widget('ui.stationFinder', {
     options: {
       dataset: ''
@@ -15,7 +17,7 @@
 //      console.log('ui.stationFinder _init()');
 //      console.log('\t' + o.dataset);
       el.addClass('station-finder');
-      var dlg = $('<div></div>').appendTo(el);
+      dlg = $('<div></div>').appendTo(el);
       var ajaxCounter = 0, ajaxCompletedCounter = 0;
       $('<input type="text"/>').focus().unbind().on('keyup', function(e) {
         e.preventDefault();
@@ -44,20 +46,18 @@
                 } else {
 //                  console.log(result['number_of_results'] + ' record(s) retrieved');
                   $('<p class="station-finder-info">Found ' + result['number_of_results'] + ' station(s)</p>').appendTo(dlg);
-                  if (result['number_of_results'] > 0) {
-                    console.log('Sending event station-finder-station-list...');
-                    $(document).trigger('station-finder-station-list', [result['data']]);
+                  console.log('Sending event station-finder-station-list...');
+                  $(document).trigger('station-finder-station-list', [result['data']]);
 /*
-                    var sel = $('<select class="station-finder-list"></select>');
-                    var optionsAsString = '';
-                    $.each(result['data'], function(k, v) {
-//                      console.log(v[0] + ', ' + v[1] + ', ' + v[2] + ', (' + v[3] + ', ' + v[4] + ')');
-                      optionsAsString += '<option value="' + v[0] + '">' + v[1] + '</option>';
-                    });
-                    sel.append(optionsAsString).appendTo(dlg);
+                  var sel = $('<select class="station-finder-list"></select>');
+                  var optionsAsString = '';
+                  $.each(result['data'], function(k, v) {
+//                    console.log(v[0] + ', ' + v[1] + ', ' + v[2] + ', (' + v[3] + ', ' + v[4] + ')');
+                    optionsAsString += '<option value="' + v[0] + '">' + v[1] + '</option>';
+                  });
+                  sel.append(optionsAsString).appendTo(dlg);
 */
-//                    setTimeout(function() {dlg.dialog('close')}, 2000);
-                  }
+//                  setTimeout(function() {dlg.dialog('close')}, 2000);
                 }
               } else {
 //                console.log('Result discarded');
@@ -92,8 +92,17 @@
       el.empty();
 
       $.Widget.prototype.destroy.call(this);
-    }
+    },
 
+    open: function() {
+      console.log('ui.stationFinder open');
+      dlg.dialog('open');
+    },
+
+    close: function() {
+      console.log('ui.stationFinder close');
+      dlg.dialog('close');
+    }
   });
 
 })(jQuery);

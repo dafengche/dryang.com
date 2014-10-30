@@ -26,7 +26,7 @@ $(function() {
     console.log('Received event station-finder-station-list');
     var optionsAsString = '';
     $.each(data, function(k, v) {
-//      console.log(v[0] + ', ' + v[1] + ', ' + v[2] + ', (' + v[3] + ', ' + v[4] + ')');
+//      console.log(v[0] + ', ' + v[1] + ', (' + v[2] + ', ' + v[3] + ')');
       optionsAsString += '<option value="' + v[0] + '">' + v[1] + '</option>';
     });
     $('#verif_stn').empty().append(optionsAsString);
@@ -34,16 +34,25 @@ $(function() {
 
   $('#verif_dataset').on('change', function() {
     var dataset = $(this).val();
-    if (dataset === 'boe')
-      $('#verif_plot_type_block').hide();
-    else
-      $('#verif_plot_type_block').show();
 
-    if (dataset === 'emep')
-      $('#verif_stn_finder').stationFinder({'dataset': dataset});
-    else
+    if (dataset === 'emep') {
+      $('#verif_plot_type_block').show();
+      // Station finder widget
       if ($('#verif_stn_finder').hasClass('station-finder'))
-        $('#verif_stn_finder').stationFinder('destroy');
+        $('#verif_stn_finder').stationFinder('option', 'dataset', dataset).stationFinder('open');
+      else // New instance
+        $('#verif_stn_finder').stationFinder({'dataset': dataset});
+    } else {
+      if ($('#verif_stn_finder').hasClass('station-finder'))
+        $('#verif_stn_finder').stationFinder('close');
+
+      if (dataset === 'gaw') {
+        $('#verif_plot_type_block').show();
+        getStations(dataset);
+      } else {
+        $('#verif_plot_type_block').hide();
+      }
+    }
   });
 /*
   $('#verif_plot_type').on('change', function() {
@@ -89,7 +98,6 @@ $(function() {
       dataType: 'json',
       data: JSON.stringify(params),
       success: function(result) {
-        $('#verif_plot_btn').removeAttr('disabled');
         if (result['error']) {
 //          msg.text(result['error']);
           img.attr('src', STATIC_URL + 'common/images/failed.jpg')
@@ -206,12 +214,14 @@ $(function() {
         });
       },
       error: function(result) {
-        $('#verif_plot_btn').removeAttr('disabled');
 //        msg.text(result['error']);
         img.attr('src', '{{ STATIC_URL }}common/images/failed.jpg')
           .load(function() {
             setContainerDimension(container, this.width, this.height)
           });
+      },
+      complete: function() {
+        $('#verif_plot_btn').removeAttr('disabled');
       }
     });
   }
@@ -245,6 +255,37 @@ $(function() {
     container.css({
       'width' : width,
       'height': height
+    });
+  }
+
+  function getStations(dataset) {
+    $('#verif_plot_btn').attr('disabled', 'disabled');
+    var msg = $('#verif_msg').text('');
+    $.ajax({
+      url: 'get-stations/',
+      type: 'post',
+      dataType: 'json',
+      data: JSON.stringify({
+        'dataset': dataset,
+        'name'   : name
+      }),
+      success: function(result) {
+//        console.log('success');
+        if (result['error']) {
+//          console.log(result['error']);
+          msg.text('Request failed!');
+        } else {
+//          console.log(result['number_of_results'] + ' record(s) retrieved');
+          var optionsAsString = '';
+          $.each(result['data'], function(k, v) {
+            optionsAsString += '<option value="' + v[0] + '">' + v[1] + '</option>';
+          });
+          $('#verif_stn').empty().append(optionsAsString);
+        }
+      },
+      complete: function() {
+        $('#verif_plot_btn').removeAttr('disabled');
+      }
     });
   }
 
