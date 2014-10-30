@@ -17,7 +17,7 @@ def login(request):
     if request.POST:
         username = request.POST['username']
         password = request.POST['password']
-        logger.debug('Authenticating ' + username + '...')
+        logger.debug('Authenticating started for ' + username)
         user = auth.authenticate(username = username, password = password)
         if user is not None:
             if user.is_active:
@@ -35,6 +35,10 @@ def login(request):
             return render(request, 'auth/login.html', {'msg': 'Login failed, please try again.'})
     else:
         # Go to the login page
+        try:
+            logger.debug(request.META['REMOTE_USER'])
+        except KeyError:
+            logger.debug('REMOTE_USER not found in request.META')
         logger.debug('Going to the login page...')
         return render(request, 'auth/login.html')
 

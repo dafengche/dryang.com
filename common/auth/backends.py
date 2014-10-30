@@ -8,12 +8,20 @@ from django.contrib.auth.models import User
 
 logger = logging.getLogger(__name__)
 
+class X509Backend(object):
+    def authenticate(self, remote_user):
+        logger.debug('Authenticating ' + remote_user + '...');
+        return None
+
+    def get_user(self, user_id):
+        logger.debug('get_user(): ' + str(user_id))
+        return None
+
 class LDAPBackend(object):
     def authenticate(self, username = None, password = None):
         if username is None: return None
-        logger.debug('Authenticating: ' + username + ' against LDAP...')
         try:
-            logger.debug('LDAP authentication for ' + username + ' against ' + settings.LDAP_SERVER_URI)
+            logger.debug('Authenticating ' + username + ' against ' + settings.LDAP_SERVER_URI + '...')
             conn = ldap.initialize(settings.LDAP_SERVER_URI)
             conn.simple_bind_s('cn=' + username + ',' + settings.LDAP_DIR_USER, password)
         except ldap.LDAPError, e:
@@ -30,7 +38,7 @@ class LDAPBackend(object):
         user = None
         try:
             user = User.objects.get(username = username)
-            logger.debug(username + " found in Django's user database")
+            logger.debug('Found ' + username + " in Django's user database")
         except User.DoesNotExist:
             logger.debug(username + " not found in Django's user database")
             result = conn.search_s(settings.LDAP_DIR_USER, ldap.SCOPE_SUBTREE, 'cn=%s' % username, ['uid', 'givenName', 'sn', 'mail'])
@@ -46,7 +54,7 @@ class LDAPBackend(object):
         return user
 
     def get_user(self, user_id):
-        logger.debug('Function get_user: ' + str(user_id))
+        logger.debug('get_user(): ' + str(user_id))
         try:
             return User.objects.get(pk = user_id)
         except User.DoesNotExist:

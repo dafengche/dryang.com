@@ -42,11 +42,13 @@ INSTALLED_APPS = (
     'verif',
 )
 
+# django.contrib.auth.middleware.RemoteUserMiddleware added, 30OCT14
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+#    'django.contrib.auth.middleware.RemoteUserMiddleware',
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -135,22 +137,20 @@ LOGGING = {
     },
     'loggers': {
 #        'django': {
-#            'handlers':['file'],
+##            'handlers': ['console', 'file'],
+#            'handlers':['console'],
 #            'propagate': True,
-#            'level': 'INFO',
+#            'level': 'DEBUG',
 #        },
         'demo': {
-#            'handlers': ['console', 'file'],
             'handlers': ['console'],
             'level': 'DEBUG',
         },
         'verif': {
-#            'handlers': ['console', 'file'],
             'handlers': ['console'],
             'level': 'DEBUG',
         },
         'common.auth': {
-#            'handlers': ['console', 'file'],
             'handlers': ['console'],
             'level': 'DEBUG',
         },
@@ -167,8 +167,13 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 
 
-# AuthN, 22OCT14
+# Customise AuthN
+# common.auth.backends.LDAPBackend added, 22OCT14
+# django.contrib.auth.backends.RemoteUserBackend added, 30OCT14
+# Deafult AUTHENTICATION_BACKENDS: django.contrib.auth.backends.ModelBackend
 AUTHENTICATION_BACKENDS = (
+#    'django.contrib.auth.backends.RemoteUserBackend',
+#    'common.auth.backends.X509Backend',
     'common.auth.backends.LDAPBackend',
 #    'django.contrib.auth.backends.ModelBackend',
 )
