@@ -24,9 +24,12 @@ $(function() {
 
   $(document).bind('station-finder-station-list', function(e, data) {
     console.log('Received event station-finder-station-list');
+    var optionsAsString = '';
     $.each(data, function(k, v) {
-      console.log(v[0] + ', ' + v[1] + ', ' + v[2] + ', (' + v[3] + ', ' + v[4] + ')');
+//      console.log(v[0] + ', ' + v[1] + ', ' + v[2] + ', (' + v[3] + ', ' + v[4] + ')');
+      optionsAsString += '<option value="' + v[0] + '">' + v[1] + '</option>';
     });
+    $('#verif_stn').empty().append(optionsAsString);
   });
 
   $('#verif_dataset').on('change', function() {

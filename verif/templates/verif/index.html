@@ -22,9 +22,7 @@ Navigation menu
       <option value="gaw">GAW</option>
     </select>
   </div>
-  <div id="verif_stn_finder"></div>
   <div id="verif_plot_type_block" style="display:none;">
-    <br/>
     <b>Type of plot:</b>
     <select id="verif_plot_type" class="verif_select">
       <option value="mean_plot">Mean plot</option>
@@ -33,12 +31,16 @@ Navigation menu
       <option value="scatter_plot">Scatter plot</option>
       <option value="histogram">Histogram</option>
     </select>
+    <br/>
+    <b>Station:</b>
+    <select id="verif_stn" class="verif_select"></select>
   </div>
   <div>
     <br/>
     <input id="verif_plot_btn" type="submit" value="Plot"/>
   </div>
 </form>
+<div id="verif_stn_finder"></div>
 {% endblock %}
 
 {% comment %}
