@@ -10,9 +10,12 @@ logger = logging.getLogger(__name__)
 
 def login(request):
     username = password = ''
-    redirect_url = request.GET['next']
+    redirect_url = '/'
+    if 'next' in request.GET: redirect_url = request.GET['next']
     if not redirect_url: redirect_url = '/'
     elif redirect_url == reverse('dryang-auth:logout'): redirect_url = '/'
+    # TODO: Remove the line below
+    if redirect_url == '/': redirect_url = '/verif/'
     logger.debug('next: ' + redirect_url)
     if request.POST:
         username = request.POST['username']
@@ -36,7 +39,8 @@ def login(request):
     else:
         # Go to the login page
         try:
-            logger.debug(request.META['REMOTE_USER'])
+#            logger.debug(request.META['REMOTE_USER'])
+            logger.debug(request.META['HTTP_X_PROXY_REMOTE_USER'])
         except KeyError:
             logger.debug('REMOTE_USER not found in request.META')
         logger.debug('Going to the login page...')
