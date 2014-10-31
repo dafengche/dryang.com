@@ -75,7 +75,7 @@
               ajaxCompletedCounter += 1;
             }
           });
-          }, 800);
+          }, 500);
         }
       }).appendTo(dlg);
       dlg.dialog({

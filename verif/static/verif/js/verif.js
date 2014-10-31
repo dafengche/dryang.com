@@ -30,6 +30,13 @@ $(function() {
       optionsAsString += '<option value="' + v[0] + '">' + v[1] + '</option>';
     });
     $('#verif_stn').empty().append(optionsAsString);
+
+    // Show a search icon
+    if ($('img.verif-stn-search').length == 0) {
+      $('<img class="verif-stn-search" src="' + STATIC_URL + 'common/images/search.png"/>').on('click', function() {
+        $('#verif_stn_finder').stationFinder('open');
+      }).appendTo($('#verif_plot_type_block'));
+    }
   });
 
   $('#verif_dataset').on('change', function() {
@@ -43,6 +50,8 @@ $(function() {
       else // New instance
         $('#verif_stn_finder').stationFinder({'dataset': dataset});
     } else {
+      // Hide the search icon, station finder widget
+      $('.verif-stn-search').remove();
       if ($('#verif_stn_finder').hasClass('station-finder'))
         $('#verif_stn_finder').stationFinder('close');
 
