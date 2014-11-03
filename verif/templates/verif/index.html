@@ -4,9 +4,11 @@
 <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}common/jquery-ui-1.11.2/jquery-ui.min.css'/>
 <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}verif/css/verif.css'/>
 <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}verif/widgets/station-finder/station-finder.css'/>
+<link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}verif/widgets/zoomable-image/zoomable-image.css'/>
 <script type='text/javascript' src='{{ STATIC_URL }}common/jquery-ui-1.11.2/jquery-ui.min.js'></script>
 <script type='text/javascript' src='{{ STATIC_URL }}verif/js/verif.js'></script>
 <script type='text/javascript' src='{{ STATIC_URL }}verif/widgets/station-finder/station-finder.js'></script>
+<script type='text/javascript' src='{{ STATIC_URL }}verif/widgets/zoomable-image/zoomable-image.js'></script>
 {% endblock %}
 
 {% comment %}
@@ -48,6 +50,9 @@ Main body
 {% endcomment %}
 {% block main %}
 <h2>Verification App</h2>
+{% comment %}
 <div id="verif_container"><img id="verif_img"/></div>
 <div><p id="verif_msg"></p></div>
+{% endcomment %}
+<div id="verif_container"></div>
 {% endblock %}

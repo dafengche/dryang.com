@@ -89,10 +89,19 @@ $(function() {
     });
   });
 
+  $('#verif_container').zoomableImage();
+
   // params must contain dataset and plot_type
   function getPlot(params) {
 //    console.log(params);
+    var container = $('#verif_container');
+    var pt = params['plot_type'];
+    if (pt === 'time_series' || pt === 'score_map')
+      container.zoomableImage('option', 'zoomable', true);
+    else
+      container.zoomableImage('option', 'zoomable', false);
 
+/*
     var container = $('#verif_container').unbind();
     var msg = $('#verif_msg').text('');
     var img = $('#verif_img')
@@ -100,6 +109,8 @@ $(function() {
       .load(function() {
         setContainerDimension(container, this.width, this.height)
       });
+*/
+    $('#verif_container').zoomableImage('update', STATIC_URL + 'common/images/loading.gif');
 
     $.ajax({
       url: 'get-plot/',
@@ -108,6 +119,14 @@ $(function() {
       data: JSON.stringify(params),
       success: function(result) {
         if (result['error']) {
+          container.zoomableImage('update', STATIC_URL + 'common/images/failed.jpg');
+          return;
+        }
+        container.zoomableImage('update', result['url']);
+        if (pt === 'time_series' || pt === 'score_map')
+          container.zoomableImage('option', 'metadata', result['metadata']);
+
+/*        if (result['error']) {
 //          msg.text(result['error']);
           img.attr('src', STATIC_URL + 'common/images/failed.jpg')
             .load(function() {
@@ -220,14 +239,15 @@ $(function() {
 
           // Request a updated plot
           getPlot(params);
-        });
+        });*/
       },
       error: function(result) {
 //        msg.text(result['error']);
-        img.attr('src', '{{ STATIC_URL }}common/images/failed.jpg')
+/*        img.attr('src', STATIC_URL + 'common/images/failed.jpg')
           .load(function() {
             setContainerDimension(container, this.width, this.height)
-          });
+          });*/
+        container.zoomableImage('update', STATIC_URL + 'common/images/failed.jpg');
       },
       complete: function() {
         $('#verif_plot_btn').removeAttr('disabled');
