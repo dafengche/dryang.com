@@ -173,7 +173,6 @@ CELERY_TASK_SERIALIZER = 'json'
 # Deafult AUTHENTICATION_BACKENDS: django.contrib.auth.backends.ModelBackend
 AUTHENTICATION_BACKENDS = (
 #    'django.contrib.auth.backends.RemoteUserBackend',
-#    'common.auth.backends.X509Backend',
     'common.auth.backends.LDAPBackend',
 #    'django.contrib.auth.backends.ModelBackend',
 )
@@ -184,6 +183,7 @@ LDAP_DIR_USER = 'ou=Users,dc=dryang,dc=com'
 # LOGIN_REDIRECT_URL default: /accounts/profile/
 # LOGIN_URL          default: /accounts/login/
 # LOGOUT_URL         default: /accounts/logout/
+LOGIN_REDIRECT_URL = '/verif/'
 
 # Make every RequestContext contain a variable "request", which is the current
 # HttpRequest, 27OCT14

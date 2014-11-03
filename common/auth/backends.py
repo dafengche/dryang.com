@@ -8,32 +8,29 @@ from django.contrib.auth.models import User
 
 logger = logging.getLogger(__name__)
 
-class X509Backend(object):
-    def authenticate(self, remote_user):
-        logger.debug('Authenticating ' + remote_user + '...');
-        return None
-
-    def get_user(self, user_id):
-        logger.debug('get_user(): ' + str(user_id))
-        return None
-
 class LDAPBackend(object):
-    def authenticate(self, username = None, password = None):
-        if username is None: return None
-        try:
-            logger.debug('Authenticating ' + username + ' against ' + settings.LDAP_SERVER_URI + '...')
-            conn = ldap.initialize(settings.LDAP_SERVER_URI)
-            conn.simple_bind_s('cn=' + username + ',' + settings.LDAP_DIR_USER, password)
-        except ldap.LDAPError, e:
-            logger.debug('LDAP authentication failed!')
-            logger.debug(e)
-            return None
-        except Exception, e:
-            logger.debug('LDAP authentication failed!')
-            logger.debug(e)
-            return None
+    def authenticate(self, username = None, password = None, remote_user = None):
+        if username is None and remote_user is None: return None
 
-        logger.debug('LDAP authentication for ' + username + ' was successful')
+        conn = ldap.initialize(settings.LDAP_SERVER_URI)
+
+        # remote_user has priority
+        if remote_user is not None:
+            username = remote_user
+            logger.debug('User ' + username + ' has already been authenticated by the web server')
+        else:
+            try:
+                logger.debug('Authenticating ' + username + ' against ' + settings.LDAP_SERVER_URI + '...')
+                conn.simple_bind_s('cn=' + username + ',' + settings.LDAP_DIR_USER, password)
+                logger.debug('LDAP authentication for ' + username + ' was successful')
+            except ldap.LDAPError, e:
+                logger.debug('LDAP authentication failed!')
+                logger.debug(e)
+                return None
+            except Exception, e:
+                logger.debug('LDAP authentication failed!')
+                logger.debug(e)
+                return None
 
         user = None
         try:
@@ -41,16 +38,21 @@ class LDAPBackend(object):
             logger.debug('Found ' + username + " in Django's user database")
         except User.DoesNotExist:
             logger.debug(username + " not found in Django's user database")
-            result = conn.search_s(settings.LDAP_DIR_USER, ldap.SCOPE_SUBTREE, 'cn=%s' % username, ['uid', 'givenName', 'sn', 'mail'])
-            uid = result[0][-1].get('uid')
-            first_name = result[0][-1].get('givenName')
-            last_name = result[0][-1].get('sn')
-            mail = result[0][-1].get('mail')
-            logger.debug('%s: %s %s, %s ' % (uid, first_name, last_name, mail))
-            user = User(username = username, password = '!', first_name = first_name, last_name = last_name, email = mail)
-            user.is_staff = True
-#            user.is_superuser = True
-            user.save()
+            try:
+                result = conn.search_s(settings.LDAP_DIR_USER, ldap.SCOPE_SUBTREE, 'cn=%s' % username, ['uid', 'givenName', 'sn', 'mail'])
+                uid = result[0][-1].get('uid')
+                first_name = result[0][-1].get('givenName')
+                last_name = result[0][-1].get('sn')
+                mail = result[0][-1].get('mail')
+                logger.debug('%s: %s %s, %s ' % (uid, first_name, last_name, mail))
+                user = User(username = username, password = '!', first_name = first_name, last_name = last_name, email = mail)
+                user.is_staff = True
+#                user.is_superuser = True
+                user.save()
+            except Exception, e:
+                logger.debug('LDAP query failed!')
+                logger.debug(e)
+                return None
         return user
 
     def get_user(self, user_id):
