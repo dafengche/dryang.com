@@ -9,10 +9,10 @@
 
     _init: function() {
       var self = this, o = self.options, el = self.element;
-      console.log('_init');
+//      console.log('_init');
       el.addClass('zoomable-image').addClass('zoomable-image-container');
       img = $('<img/>').addClass('zoomable-image-img').load(function() {
-        console.log('Image loaded, width = ' + this.width + ', height = ' + this.height);
+//        console.log('Image loaded, width = ' + this.width + ', height = ' + this.height);
         el.css({
           'width' : this.width,
           'height': this.height
@@ -32,7 +32,7 @@
       var self = this, o = self.options, el = self.element;
       if (k === 'zoomable') {
         if (v) { // Zoomable
-          console.log('Zoomable');
+ //         console.log('Zoomable');
 
           var rect = $('<div>').addClass('zoomable-image-rect');
           var drag = false;
@@ -90,7 +90,26 @@
 //            console.log('Mouse up at (' + endX + ', ' + endY + ')');
             rect.remove();
 
-            // TODO: Send out a message
+            var offset = $(this).offset();
+//            console.log('offset.left: ' + offset.left + ', offset.top: ' + offset.top);
+            var xy = getXY(endX - offset.left, endY - offset.top, o.metadata);
+            x2 = xy[0], y2 = xy[1];
+//            console.log('-> (' + x2 + ', ' + y2 + ')');
+
+            if (x1 > x2) [x1, x2] = [x2, x1];
+            if (y1 > y2) [y1, y2] = [y2, y1];
+            x1 = x1 < o.metadata['x_min'] ? o.metadata['x_min'] : x1;
+            y1 = y1 < o.metadata['y_min'] ? o.metadata['y_min'] : y1;
+            x2 = x2 > o.metadata['x_max'] ? o.metadata['x_max'] : x2;
+            y2 = y2 > o.metadata['y_max'] ? o.metadata['y_max'] : y2;
+//            console.log('x1, y1, x2, y2: ' + x1 + ', ' + y1 + ', ' + x2 + ', ' + y2);
+            console.log('Sending event zoomable-image-selected-area...');
+            $(document).trigger('zoomable-image-selected-area', [{
+              'x1': x1,
+              'y1': y1,
+              'x2': x2,
+              'y2': y2
+            }]);
           });
         } else {
           el.unbind();
@@ -100,7 +119,7 @@
     },
 
     update: function(imgSrc) {
-      console.log('Update img src to ' + imgSrc);
+//      console.log('Update img src to ' + imgSrc);
       img.attr('src', imgSrc);
     }
   });

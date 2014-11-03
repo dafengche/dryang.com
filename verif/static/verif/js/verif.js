@@ -39,6 +39,34 @@ $(function() {
     }
   });
 
+  $(document).bind('zoomable-image-selected-area', function(e, data) {
+    console.log('Received event zoomable-image-selected-area');
+    var x1 = data['x1'], y1 = data['y1'], x2 = data['x2'], y2 = data['y2'];
+//    console.log('x1, y1, x2, y2: ' + x1 + ', ' + y1 + ', ' + x2 + ', ' + y2);
+    var dataset = $('#verif_dataset').val();
+    var pt = $('#verif_plot_type').val();
+    if ('boe' === dataset)
+      pt = 'time_series';
+    var params = {
+      'dataset'  : $('#verif_dataset').val(),
+      'plot_type': pt
+    };
+    if (pt === 'time_series') {
+      x1 = new Date(x1);
+      x2 = new Date(x2);
+      params['start_date'] = x1;
+      params['end_date'] = x2;
+//      console.log('Date range selected: ' + x1 + ', ' + x2);
+    } else { // score_map
+      params['sw_lon'] = x1;
+      params['sw_lat'] = y1;
+      params['ne_lon'] = x2;
+      params['ne_lat'] = y2;
+    }
+//    console.log('x1, y1, x2, y2: ' + x1 + ', ' + y1 + ', ' + x2 + ', ' + y2);
+    getPlot(params);
+  });
+
   $('#verif_dataset').on('change', function() {
     var dataset = $(this).val();
 
@@ -68,7 +96,6 @@ $(function() {
     getPlot({
       'dataset'  : $('#verif_dataset').val(),
       'plot_type': $(this).val()
-      
     });
   });
 */
@@ -101,15 +128,7 @@ $(function() {
     else
       container.zoomableImage('option', 'zoomable', false);
 
-/*
-    var container = $('#verif_container').unbind();
-    var msg = $('#verif_msg').text('');
-    var img = $('#verif_img')
-      .attr('src', STATIC_URL + 'common/images/loading.gif')
-      .load(function() {
-        setContainerDimension(container, this.width, this.height)
-      });
-*/
+    $('#verif_plot_btn').attr('disabled', 'disabled');
     $('#verif_container').zoomableImage('update', STATIC_URL + 'common/images/loading.gif');
 
     $.ajax({
@@ -123,167 +142,21 @@ $(function() {
           return;
         }
         container.zoomableImage('update', result['url']);
-        if (pt === 'time_series' || pt === 'score_map')
-          container.zoomableImage('option', 'metadata', result['metadata']);
-
-/*        if (result['error']) {
-//          msg.text(result['error']);
-          img.attr('src', STATIC_URL + 'common/images/failed.jpg')
-            .load(function() {
-              setContainerDimension(container, this.width, this.height)
-            });
-          return;
-        }
-        img.attr('src', result['url'])
-          .load(function() {
-            setContainerDimension(container, this.width, this.height)
-          });
-
-        var pt = params['plot_type'];
-        if ('time_series' != pt && 'score_map' != pt) {
-          return;
-        }
-
-        // Zoom
-        var md = result['metadata'];
-        if ('time_series' === pt) { // YYYY-MM-DD -> milliseconds since 1970/01/01
-          md['x_min'] = new Date(md['x_min']).getTime();
-          md['x_max'] = new Date(md['x_max']).getTime();
-        }
-
-        var rect = $('<div>', {id: 'verif_rect'});
-        var drag = false;
-        var startX, startY;
-        var x1, x2, y1, y2;
-
-        container.on('mouseenter', function(e) {
-          e.preventDefault();
-          container.css('cursor', 'crosshair');
-        }).on('mouseleave', function(e) {
-          e.preventDefault();
-          container.css('cursor', 'default');
-        }).on('mousedown', function(e) {
-          e.preventDefault();
-          drag = true;
-          startX = e.pageX, startY = e.pageY;
-//          console.log('Mouse down at (' + startX + ', ' + startY + ')');
-          rect.css({
-            'top'   : startY + 'px',
-            'left'  : startX + 'px',
-            'width' : '0',
-            'height': '0'
-          });
-          rect.appendTo(container);
-
-          var offset = $(this).offset();
-//          console.log('offset.left: ' + offset.left + ', offset.top: ' + offset.top);
-          var xy = getXY(startX - offset.left, startY - offset.top, md);
-          x1 = xy[0], y1 = xy[1];
-//          console.log('-> (' + x1 + ', ' + y1 + ')');
-        }).on('mousemove', function(e) {
-          e.preventDefault();
-          if (drag) { // Draw a rectangle
-            var endX = e.pageX, endY = e.pageY;
-//            console.log('Mouse move at (' + endX + ', ' + endY + ')');
-            var width = Math.abs(endX - startX);
-            var height = Math.abs(endY - startY);
-            var newX = (endX < startX) ? (startX - width) : startX;
-            var newY = (endY < startY) ? (startY - height) : startY;
-            rect.css({
-              'width'           : width + 'px',
-              'height'          : height + 'px',
-              'top'             : newY + 'px',
-              'left'            : newX + 'px',
-              'background-color': '#C0C0C0',
-              'zoom'            : 1,
-              'filter'          : 'alpha(opacity = 50)',
-              'opacity'         : 0.5
-            });
+        if (pt === 'time_series' || pt === 'score_map') {
+          var md = result['metadata'];
+          if ('time_series' === pt) { // YYYY-MM-DD -> milliseconds since 1970/01/01
+            md['x_min'] = new Date(md['x_min']).getTime();
+            md['x_max'] = new Date(md['x_max']).getTime();
           }
-        }).on('mouseup', function(e) {
-          e.preventDefault();
-          drag = false;
-          var endX = e.pageX, endY = e.pageY;
-//          console.log('Mouse up at (' + endX + ', ' + endY + ')');
-          rect.remove();
-
-          var offset = $(this).offset();
-//          console.log('offset.left: ' + offset.left + ', offset.top: ' + offset.top);
-          var xy = getXY(endX - offset.left, endY - offset.top, md);
-          x2 = xy[0], y2 = xy[1];
-//          console.log('-> (' + x2 + ', ' + y2 + ')');
-
-          if (x1 > x2) [x1, x2] = [x2, x1];
-          if (y1 > y2) [y1, y2] = [y2, y1];
-          x1 = x1 < md['x_min'] ? md['x_min'] : x1;
-          y1 = y1 < md['y_min'] ? md['y_min'] : y1;
-          x2 = x2 > md['x_max'] ? md['x_max'] : x2;
-          y2 = y2 > md['y_max'] ? md['y_max'] : y2;
-
-          if ('time_series' === pt) {
-            x1 = new Date(x1);
-            x2 = new Date(x2);
-            params['start_date'] = x1;
-            params['end_date'] = x2;
-//            console.log('Date range selected: ' + x1 + ', ' + x2);
-          } else { // score_map
-            params['sw_lon'] = x1;
-            params['sw_lat'] = y1;
-            params['ne_lon'] = x2;
-            params['ne_lat'] = y2;
-//            console.log('Area selected: sw(' + x1 + ', ' + y1 + '), ne('
-//              + x2 + ', ' + y2 + ')');
-          }
-
-          $('#verif_plot_btn').attr('disabled', 'disabled');
-
-          // Request a updated plot
-          getPlot(params);
-        });*/
+          container.zoomableImage('option', 'metadata', md);
+        }
       },
       error: function(result) {
-//        msg.text(result['error']);
-/*        img.attr('src', STATIC_URL + 'common/images/failed.jpg')
-          .load(function() {
-            setContainerDimension(container, this.width, this.height)
-          });*/
         container.zoomableImage('update', STATIC_URL + 'common/images/failed.jpg');
       },
       complete: function() {
         $('#verif_plot_btn').removeAttr('disabled');
       }
-    });
-  }
-
-  function getXY(x, y, metadata) {
-    var height = metadata['height']
-    var width = metadata['width']
-    var xmin = metadata['x_min'];
-    var xmax = metadata['x_max'];
-    var ymin = metadata['y_min'];
-    var ymax = metadata['y_max'];
-    var subplotLeft = metadata['subplot_left'];
-    var subplotRight = metadata['subplot_right'];
-    var subplotBottom = metadata['subplot_bottom'];
-    var subplotTop = metadata['subplot_top'];
-//    console.log('height: ' + height + ', width: ' + width);
-//    console.log('xmin: ' + xmin + ', xmax: ' + xmax);
-//    console.log('ymin: ' + ymin + ', ymax: ' + ymax);
-//    console.log('subplot: left = ' + subplotLeft + ', right = ' + subplotRight + ', bottom = ' + subplotBottom + ', top = ' + subplotTop);
-
-//    console.log('(' + x + ', ' + y + ')');
-    x = xmin + (x - width * subplotLeft) * (xmax - xmin) / (width * (subplotRight - subplotLeft));
-    y = ymin + (height * (subplotTop - subplotBottom) - (y - height * (1. - subplotTop))) * (ymax - ymin) / (height * (subplotTop - subplotBottom));
-//    console.log('-> (' + x + ', ' + y + ')');
-
-    return [x, y];
-  }
-
-  function setContainerDimension(container, width, height) {
-//    console.log('Set container width and height to ' + width + ', ' + height);
-    container.css({
-      'width' : width,
-      'height': height
     });
   }
 
