@@ -46,8 +46,9 @@ class LDAPBackend(object):
                 mail = result[0][-1].get('mail')
                 logger.debug('%s: %s %s, %s ' % (uid, first_name, last_name, mail))
                 user = User(username = username, password = '!', first_name = first_name, last_name = last_name, email = mail)
-                user.is_staff = True
-#                user.is_superuser = True
+                user.is_active = True
+                user.is_staff = False
+                user.is_superuser = False
                 user.save()
             except Exception, e:
                 logger.debug('LDAP query failed!')
