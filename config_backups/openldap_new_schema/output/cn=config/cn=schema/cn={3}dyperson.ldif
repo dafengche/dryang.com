@@ -1,0 +1,11 @@
+# AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
+# CRC32 08a02642
+dn: cn=dyperson,cn=schema,cn=config
+objectClass: olcSchemaConfig
+cn: dyperson
+olcAttributeTypes: {0}( 2.25.238899325314787638530070303140750935323.1.1 NAME 
+ 'group' EQUALITY caseIgnoreMatch SUBSTR caseIgnoreSubstringsMatch SYNTAX 1.3.
+ 6.1.4.1.1466.115.121.1.15{256} )
+olcObjectClasses: {0}( 2.25.238899325314787638530070303140750935323.2.1 NAME '
+ dyPerson' DESC 'Dr Yang Company Person' SUP inetOrgPerson STRUCTURAL MAY grou
+ p )

@@ -1,0 +1,15 @@
+# LDAP attribute description is defined in RFC2252
+# Default multi-valued
+attributetype ( 2.25.238899325314787638530070303140750935323.1.1
+    NAME 'group'
+    EQUALITY caseIgnoreMatch
+    SUBSTR caseIgnoreSubstringsMatch
+    SYNTAX 1.3.6.1.4.1.1466.115.121.1.15{256} )
+
+# LDAP object description is defined in RFC2252
+objectclass ( 2.25.238899325314787638530070303140750935323.2.1
+    NAME 'dyPerson'
+        DESC 'Dr Yang Company Person'
+    SUP inetOrgPerson
+    STRUCTURAL
+        MAY (group) )
