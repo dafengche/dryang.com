@@ -40,6 +40,7 @@ INSTALLED_APPS = (
     'common.auth.apps.AuthConfig',
     'demo',
     'verif',
+    'badminton',
 )
 
 # django.contrib.auth.middleware.RemoteUserMiddleware added, 30OCT14
@@ -63,10 +64,17 @@ WSGI_APPLICATION = 'apps.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 
+# Changed to PostgreSQL, 5NOV14
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'django',
+        'USER': 'django',
+        'PASSWORD': 'django',
+        'HOST': 'db01.dryang.com',
+        'PORT': '', # Empty string for the default value
     }
 }
 
@@ -89,9 +97,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-# 23OCT14
 # List of additional locations for
-# django.contrib.staticfiles.finders.FileSystemFinder
+# django.contrib.staticfiles.finders.FileSystemFinder, 23OCT14
 STATICFILES_DIRS = (
     '/home/maxy/git/dev/dryang.com/common/static',
 )
