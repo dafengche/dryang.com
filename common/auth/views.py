@@ -26,9 +26,10 @@ def login(request):
         try:
 #            remote_user = request.META['REMOTE_USER']
             remote_user = request.META['HTTP_X_PROXY_REMOTE_USER']
-            logger.debug('Client submitted a certificate\n\t' + remote_user)
-            user = auth.authenticate(remote_user = remote_user)
-            return login_user(request, user, redirect_url)
+            if remote_user and remote_user != '(null)':
+                logger.debug('Client submitted a certificate\n\t' + remote_user)
+                user = auth.authenticate(remote_user = remote_user)
+                return login_user(request, user, redirect_url)
         except KeyError:
             logger.debug('REMOTE_USER not found in request.META')
         # Go to the login page
