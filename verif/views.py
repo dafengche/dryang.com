@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponse
 from django.shortcuts import render
 
@@ -51,8 +51,10 @@ def is_user_in_group_tester(user):
         return user.groups.filter(name = 'tester').count() == 1
     return False
 
+# login_url is different for login_required and user_passes_test. If you have
+# both enabled using reverse_lazy, Django will panic (5NOV14)
 @login_required(login_url = reverse_lazy('dryang-auth:login'))
 #@user_passes_test(is_user_in_group_tester, login_url = reverse_lazy('dryang-auth:access-denied'))
 @user_passes_test(is_user_in_group_tester, login_url = '/auth/access-denied/')
-def test(request):
-    return render(request, 'verif/test.html', {'title': 'Verification'})
+def test_group(request):
+    return render(request, 'verif/test-group.html', {'title': 'Verification'})
