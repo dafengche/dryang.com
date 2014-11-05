@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.urlresolvers import reverse_lazy
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -45,3 +45,14 @@ def get_stations(request):
             except Exception as ex:
                 logger.error(ex)
                 return HttpResponse(json.dumps({'error': 'Request failed!'}), content_type = 'application/json')
+
+def is_user_in_group_tester(user):
+    if user:
+        return user.groups.filter(name = 'tester').count() == 1
+    return False
+
+@login_required(login_url = reverse_lazy('dryang-auth:login'))
+#@user_passes_test(is_user_in_group_tester, login_url = reverse_lazy('dryang-auth:access-denied'))
+@user_passes_test(is_user_in_group_tester, login_url = '/auth/access-denied/')
+def test(request):
+    return render(request, 'verif/test.html', {'title': 'Verification'})

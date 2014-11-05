@@ -58,3 +58,6 @@ def login_user(request, user, redirect_url):
         # Go to the login page with warning message
         logger.debug('Login failed')
         return render(request, 'auth/login.html', {'msg': 'Login failed, please try again.'})
+
+def access_denied(request):
+    return render(request, 'auth/access-denied.html')
