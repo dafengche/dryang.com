@@ -59,5 +59,6 @@ def login_user(request, user, redirect_url):
         logger.debug('Login failed')
         return render(request, 'auth/login.html', {'msg': 'Login failed, please try again.'})
 
-def access_denied(request):
-    return render(request, 'auth/access-denied.html')
+# Replaced by TemplateView (see urls.py)
+#def access_denied(request):
+#    return render(request, 'auth/access-denied.html')
