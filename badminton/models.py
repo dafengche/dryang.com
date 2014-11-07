@@ -34,6 +34,7 @@ class Cost(models.Model):
     cost_date = models.DateField()
     type = models.ForeignKey(CostType)
     amount = models.FloatField()
+    financial_year = models.IntegerField()
     comment = models.CharField(max_length = 255, blank = True, null = True)
 
     def __unicode__(self):
@@ -53,3 +54,28 @@ class Record(models.Model):
 
     class Meta:
         ordering = ['-play_date']
+
+
+class ContributionType(models.Model):
+    name = models.CharField(max_length = 255)
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        ordering = ['name']
+
+
+class Contribution(models.Model):
+    contribution_date = models.DateField()
+    type = models.ForeignKey(ContributionType)
+    amount = models.FloatField()
+    financial_year = models.IntegerField()
+    contributor = models.ForeignKey(Player, blank = True, null = True)
+    comment = models.CharField(max_length = 255, blank = True, null = True)
+
+    def __unicode__(self):
+        return str(self.contribution_date)
+
+    class Meta:
+        ordering = ['-contribution_date']
