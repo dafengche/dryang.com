@@ -1,0 +1,13 @@
+{% extends "common/base.html" %}
+
+{% block main %}
+<h3>My games in {{year}}:</h3>
+<p>{{user.first_name}}, you've played {{records|length}} game(s) this year. And the cost is {{cost|floatformat:2}} pound(s).</p>
+<ul>
+  {% for r in records %}
+    <li>{{r.play_date|date}}
+  {% empty %}
+    <li>Come on! You haven't played any game yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

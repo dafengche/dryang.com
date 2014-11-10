@@ -8,6 +8,8 @@ from django.shortcuts import render
 import json
 import logging
 
+from common.auth.utils import is_user_in_group
+
 logger = logging.getLogger(__name__)
 
 @login_required(login_url = reverse_lazy('dryang-auth:login'))
@@ -47,9 +49,7 @@ def get_stations(request):
                 return HttpResponse(json.dumps({'error': 'Request failed!'}), content_type = 'application/json')
 
 def is_user_in_group_tester(user):
-    if user:
-        return user.groups.filter(name = 'tester').count() == 1
-    return False
+    return is_user_in_group(user, 'tester')
 
 # login_url is different for login_required and user_passes_test. If you have
 # both enabled using reverse_lazy, Django will panic (5NOV14)
