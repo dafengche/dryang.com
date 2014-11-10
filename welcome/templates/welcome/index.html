@@ -1,0 +1,10 @@
+{% extends "common/base.html" %}
+
+{% block main %}
+<h2>Welcome</h2>
+<ul>
+  <li><a href="{% url 'dryang-demo:index' %}">demo</a></li>
+  <li><a href="{% url 'dryang-verif:index' %}">verif</a></li>
+  <li><a href="{% url 'dryang-badminton:index' %}">badminton</a></li>
+</ul>
+{% endblock %}

@@ -1,9 +1,11 @@
-{% load staticfiles %}
+{% extends "common/base.html" %}
 
-<script type='text/javascript' src='{{ STATIC_URL }}demo/js/jquery.min.js'></script>
+{% block css_and_js %}
 <script type='text/javascript' src='{{ STATIC_URL }}demo/js/demo.js'></script>
+{% endblock %}
 
-<h2>Demo app</h2>
+{% block main %}
+<h2>Demo</h2>
 
 <form>{% csrf_token %}
   <input id='a' value='3'/>&nbsp;
@@ -13,6 +15,6 @@
     <option value='mul'>*</option>
     <option value='div'>/</option>
   </select>&nbsp;
-  <input id='b' value='4'/>&nbsp;
-  =&nbsp;<span id='result'>7</span>
+  <input id='b' value='4'/>&nbsp;=&nbsp;<span id='result'>7</span>
 </form>
+{% endblock %}

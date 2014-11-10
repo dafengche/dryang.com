@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
 
     'common.auth.apps.AuthConfig',
+    'welcome',
     'demo',
     'verif',
     'badminton',

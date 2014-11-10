@@ -11,10 +11,11 @@ logger = logging.getLogger(__name__)
 
 def login(request):
     username = password = ''
-    redirect_url = settings.LOGIN_REDIRECT_URL
-    if 'next' in request.GET: redirect_url = request.GET['next']
-    if redirect_url == reverse('dryang-auth:logout'):
-        redirect_url = settings.LOGIN_REDIRECT_URL
+#    redirect_url = settings.LOGIN_REDIRECT_URL
+#    if 'next' in request.GET: redirect_url = request.GET['next']
+#    if redirect_url == reverse('dryang-auth:logout'):
+#        redirect_url = settings.LOGIN_REDIRECT_URL
+    redirect_url = request.GET['next']
     logger.debug('next: ' + redirect_url)
     if request.POST:
         username = request.POST['username']

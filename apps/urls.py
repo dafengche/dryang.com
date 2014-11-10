@@ -7,6 +7,7 @@ urlpatterns = patterns('',
     # url(r'^$', 'apps.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
+    url(r'^welcome/', include('welcome.urls', namespace = 'dryang-welcome')),
     url(r'^demo/', include('demo.urls', namespace = 'dryang-demo')),
     url(r'^verif/', include('verif.urls', namespace = 'dryang-verif')),
     url(r'^badminton/', include('badminton.urls', namespace = 'dryang-badminton')),

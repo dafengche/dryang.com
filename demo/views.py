@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 def index(request):
-    return render(request, 'demo/index.html')
+    return render(request, 'demo/index.html', {'title': 'Demo'})
 
 def calc(request):
     if request.is_ajax():
