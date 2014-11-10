@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 def index(request):
     data = {'title': 'Friday badminton'}
     if request.user.is_authenticated():
-        return redirect(reverse('dryang-badminton:list'))
+        return redirect(reverse('dryang-badminton:list'), data)
     else:
         return render(request, 'badminton/index.html', data)
 
@@ -26,8 +26,12 @@ def is_user_in_group_badminton_player(user):
 @login_required(login_url = reverse_lazy('dryang-auth:login'))
 @user_passes_test(is_user_in_group_badminton_player, login_url = '/auth/access-denied/')
 def list(request):
-    # TODO: Get year from request
-    year = date.today().year
+    year = request.GET.get('year', None)
+    if not year: year = date.today().year
+    else:
+        logger.debug("Found parameter 'year' in request")
+        year = int(year)
+    logger.debug('Year: %d' % year)
 
     # Get total play count
     total_play_count = 0
@@ -46,27 +50,8 @@ def list(request):
     cost = 0.
     if len(records) > 0: cost = total_cost / total_play_count * len(records)
 
-    data = {'year': date.today().year, 'records': records, 'cost': cost}
+    data = {'title': 'Friday badminton',
+            'year': year,
+            'records': records,
+            'cost': cost}
     return render(request, 'badminton/list.html', data)
-
-'''
-def calc(request):
-    if request.is_ajax():
-        if request.method == 'POST':
-            params = json.loads(request.body)
-            logger.debug('Parameters: ' + str(params))
-            a = float(params['a'])
-            b = float(params['b'])
-            o = params['o']
-            args = [a, b]
-            kwargs = {}
-            try:
-                result = request.broker.execute('services.compute.compute.' + o, *args, **kwargs)
-                logger.debug('Result: ' + str(result))
-                return HttpResponse(json.dumps(result), content_type = 'application/json')
-            except Exception as ex:
-                logger.error(ex)
-                return HttpResponse(json.dumps({'error': 'Request failed!'}), content_type = 'application/json')
-
-    return HttpResponse(json.dumps({'error': 'Request unsupported!'}), content_type = 'application/json')
-'''

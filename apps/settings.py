@@ -149,6 +149,10 @@ LOGGING = {
 #            'propagate': True,
 #            'level': 'DEBUG',
 #        },
+        'badminton': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
         'demo': {
             'handlers': ['console'],
             'level': 'DEBUG',
