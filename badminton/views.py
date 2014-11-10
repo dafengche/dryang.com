@@ -50,8 +50,14 @@ def list(request):
     cost = 0.
     if len(records) > 0: cost = total_cost / total_play_count * len(records)
 
+    # Get contributions
+    contrib = 0.
+    contribs = contribs.filter(contributor__username = request.user.username)
+    for c in contribs: contrib += c.amount
+
     data = {'title': 'Friday badminton',
             'year': year,
+            'current_year': date.today().year,
             'records': records,
-            'cost': cost}
+            'bal': contrib - cost}
     return render(request, 'badminton/list.html', data)

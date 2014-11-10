@@ -1,11 +1,23 @@
 {% extends "common/base.html" %}
 
 {% block main %}
-<h3>My games in {{year}}:</h3>
-<p>{{user.first_name}}, you've played {{records|length}} game(s) this year. And the cost is {{cost|floatformat:2}} pound(s).</p>
+<h3>My games</h3>
+<p>{{user.first_name}}, you played {{records|length}} game(s) in {{year}}. Your current balance is:
+{% if bal < 0 %}
+<span style='color:red;'>£{{bal|floatformat:'2'}}</span>
+{% else %}
+£{{bal}}
+{% endif %}
+.</p>
+
 <ul>
   {% for r in records %}
     <li>{{r.play_date|date:'d M Y'}}
   {% endfor %}
 </ul>
+<p><a href="{% url 'dryang-badminton:list' %}?year={{year|add:'-1'}}">{{year|add:'-1'}}</a>
+{% if year < current_year %}
+&nbsp;<a href="{% url 'dryang-badminton:list' %}">Current year</a>
+{% endif %}
+</p>
 {% endblock %}
