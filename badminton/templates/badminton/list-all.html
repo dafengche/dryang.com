@@ -1,16 +1,23 @@
 {% extends "common/base.html" %}
 
+{% block nav %}
+<div><a href="?p=game">Games</a></div>
+<div><a href="?p=player">Players</a></div>
+<div><a href="?p=cost">Costs</a></div>
+<div><a href="?p=contrib">Contributions</a></div>
+{% endblock %}
+
 {% block main %}
 <h3>All games</h3>
 <p>Balance for year {{year}} is:
 {% if bal < 0 %}
-<span style='color:red;'>£{{bal|floatformat:'2'}}</span>
+<span style='color:red;'>£{{bal|floatformat:'2'}}</span>.
 {% else %}
-£{{bal}}
+£{{bal}}.
 {% endif %}
-. Total play count: {{total_play_count}}.</p>
+Total play count: {{total_play_count}}.</p>
 
-<p><a href="{% url 'dryang-badminton:list-all' %}?year={{year|add:'-1'}}">{{year|add:'-1'}}</a>
+<p><a href="?year={{year|add:'-1'}}">{{year|add:'-1'}}</a>
 {% if year < current_year %}
 &nbsp;<a href="{% url 'dryang-badminton:list-all' %}">Current year</a>
 {% endif %}

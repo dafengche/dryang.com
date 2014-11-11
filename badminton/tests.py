@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from badminton.models import CostType, Cost, Player, Record
+from badminton.models import CostType, Cost, Player, Game
 
 
 class CostTypeTestCase(TestCase):

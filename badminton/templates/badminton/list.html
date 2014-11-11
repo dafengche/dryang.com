@@ -2,7 +2,7 @@
 
 {% block main %}
 <h3>My games</h3>
-<p>{{user.first_name}}, you played {{records|length}} game(s) in {{year}}. Your current balance is:
+<p>{{user.first_name}}, you played {{games|length}} game(s) in {{year}}. Your current balance is:
 {% if bal < 0 %}
 <span style='color:red;'>£{{bal|floatformat:'2'}}</span>
 {% else %}
@@ -11,8 +11,8 @@
 .</p>
 
 <ul>
-  {% for r in records %}
-    <li>{{r.play_date|date:'d M Y'}}
+  {% for g in games %}
+    <li>{{g.play_date|date:'d M Y'}}
   {% endfor %}
 </ul>
 <p><a href="{% url 'dryang-badminton:list' %}?year={{year|add:'-1'}}">{{year|add:'-1'}}</a>

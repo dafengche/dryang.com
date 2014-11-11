@@ -44,7 +44,7 @@ class Cost(models.Model):
         ordering = ['-cost_date']
 
 
-class Record(models.Model):
+class Game(models.Model):
     play_date = models.DateField()
     players = models.ManyToManyField(Player)
     comment = models.CharField(max_length = 511, blank = True, null = True)
