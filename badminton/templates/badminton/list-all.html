@@ -24,9 +24,12 @@ Total play count: {{play_count}}.</div>
   <tr>
     <td>{{g.play_date|date:'d M Y'}}:</td>
     <td>
+      {{g.players.all|length}} players
+{% comment %}
       {% for p in g.players.all %}
-    {{p.first_name}} {{p.last_name}}{% if not forloop.last %},{% endif %}
+      {{p.first_name}} {{p.last_name}}{% if not forloop.last %},{% endif %}
       {% endfor %}
+{% endcomment %}
     </td>
   </tr>
     {% endfor %}
@@ -39,12 +42,13 @@ Total play count: {{play_count}}.</div>
   <tr>
     <td>{{p.0}}:</td>
     <td>
-      {% if p.1 < 0 %}
-      <span style='color:red;'>£{{p.1|floatformat:'2'}}</span>
+      {% if p.1.1 < 0 %}
+      <span style='color:red;'>£{{p.1.1|floatformat:'2'}}</span>
       {% else %}
-      £{{p.1|floatformat:'2'}}
+      £{{p.1.1|floatformat:'2'}}
       {% endif %}
     </td>
+    <td>({{p.1.0}} game{{p.1.0|pluralize}})</td>
   </tr>
     {% endfor %}
 </table>

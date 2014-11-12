@@ -20,13 +20,18 @@ def is_user_in_group_badminton_organiser(user):
     return is_user_in_group(user, 'badminton_organiser')
 
 def get_play_count(year):
+    """
+    Return the number of players played games for the given year
+    """
     play_count = 0
     games = Game.objects.filter(play_date__year = year)
     for g in games: play_count += len(g.players.all())
     return play_count
 
 def get_bal(year):
-    # Calculate the balance (contributions - costs)
+    """
+    Return balance (contributions - costs) for the given year
+    """
     bal = 0.
     contribs = Contribution.objects.filter(financial_year = year)
     for c in contribs: bal += c.amount
@@ -35,6 +40,10 @@ def get_bal(year):
     return bal
 
 def get_players(year):
+    """
+    Return a sorted list containing info below for the given year
+    (first_name last_name, (play_count, balance))
+    """
     games = Game.objects.filter(play_date__year = year)
     if len(games) == 0: return None
 
@@ -51,12 +60,15 @@ def get_players(year):
     player_bal = {}
     cost_per_play = get_bal(year) / get_play_count(year)
     for (k, v) in player_count.items():
-        player_bal[player_name[k]] = cost_per_play * v
+        player_bal[player_name[k]] = (v, cost_per_play * v)
         contribs = Contribution.objects.filter(financial_year = year).filter(contributor__username = k)
-        for c in contribs: player_bal[player_name[k]] += c.amount
+        for c in contribs: player_bal[player_name[k]][0] += c.amount
     return sorted(player_bal.iteritems())
 
 def get_user_bal_and_games(year, username):
+    """
+    Return a tuple (balance, games_player) for a given user in a given year
+    """
     bal = get_bal(year)
     play_count = get_play_count(year)
     if play_count == 0: return (0., None)
