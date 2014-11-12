@@ -9,70 +9,76 @@
 
 {% block main %}
 <h3>Records</h3>
-<p>Balance for year {{year}} is:
+<div>Balance for year {{year}} is:
 {% if bal < 0 %}
 <span style='color:red;'>£{{bal|floatformat:'2'}}</span>.
 {% else %}
 £{{bal}}.
 {% endif %}
-Total play count: {{play_count}}.</p>
+Total play count: {{play_count}}.</div>
 
 {% if p == 'game' %}
-{% if games %}
-<ul>
-  {% for g in games %}
-    <li>{{g.play_date|date:'d M Y'}}: {{g.players.all}}
-  {% endfor %}
-</ul>
-{% endif %}
-<p><a href="{% url 'dryang-badminton:list-all' %}?p=game&year={{year|add:'-1'}}">{{year|add:'-1'}}</a>
-{% if year < current_year %}
-&nbsp;<a href="{% url 'dryang-badminton:list-all' %}?p=game">Current year</a>
-{% endif %}
-</p>
+  {% if games %}
+<table>
+    {% for g in games %}
+  <tr>
+    <td>{{g.play_date|date:'d M Y'}}:</td>
+    <td>
+      {% for p in g.players.all %}
+    {{p.first_name}} {{p.last_name}}{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    </td>
+  </tr>
+    {% endfor %}
+</table>
+  {% endif %}
 {% elif p == 'player' %}
-{% if players %}
-<ul>
-  {% for p in players %}
-    <li>{{p.0}}:
-    {% if p.1 < 0 %}
-<span style='color:red;'>£{{p.1|floatformat:'2'}}</span>
-    {% else %}
-£{{p.1|floatformat:'2'}}
-    {% endif %}
-  {% endfor %}
-</ul>
-{% endif %}
-<p><a href="{% url 'dryang-badminton:list-all' %}?p=player&year={{year|add:'-1'}}">{{year|add:'-1'}}</a>
-{% if year < current_year %}
-&nbsp;<a href="{% url 'dryang-badminton:list-all' %}?p=player">Current year</a>
-{% endif %}
-</p>
+  {% if players %}
+<table>
+    {% for p in players %}
+  <tr>
+    <td>{{p.0}}:</td>
+    <td>
+      {% if p.1 < 0 %}
+      <span style='color:red;'>£{{p.1|floatformat:'2'}}</span>
+      {% else %}
+      £{{p.1|floatformat:'2'}}
+      {% endif %}
+    </td>
+  </tr>
+    {% endfor %}
+</table>
+  {% endif %}
 {% elif p == 'cost' %}
-{% if costs %}
-<ul>
-  {% for c in costs %}
-    <li>{{c.cost_date|date:'d M Y'}}: £{{c.amount|floatformat:'2'}}, {{c.type.name}}
-  {% endfor %}
-</ul>
-{% endif %}
-<p><a href="{% url 'dryang-badminton:list-all' %}?p=cost&year={{year|add:'-1'}}">{{year|add:'-1'}}</a>
-{% if year < current_year %}
-&nbsp;<a href="{% url 'dryang-badminton:list-all' %}?p=cost">Current year</a>
-{% endif %}
-</p>
+  {% if costs %}
+<table>
+    {% for c in costs %}
+  <tr>
+    <td>{{c.cost_date|date:'d M Y'}}:</td>
+    <td>£{{c.amount|floatformat:'2'}},</td>
+    <td>{{c.type.name}}</td>
+  </tr>
+    {% endfor %}
+</table>
+  {% endif %}
 {% elif p == 'contrib' %}
-{% if contribs %}
-<ul>
-  {% for c in contribs %}
-    <li>{{c.contribution_date|date:'d M Y'}}: £{{c.amount|floatformat:'2'}}, {{c.type.name}}
-  {% endfor %}
-</ul>
+  {% if contribs %}
+<table>
+    {% for c in contribs %}
+  <tr>
+    <td>{{c.contribution_date|date:'d M Y'}}:</td>
+    <td>£{{c.amount|floatformat:'2'}},</td>
+    <td>{{c.type.name}}</td>
+  </tr>
+    {% endfor %}
+</table>
+  {% endif %}
 {% endif %}
-<p><a href="{% url 'dryang-badminton:list-all' %}?p=contrib&year={{year|add:'-1'}}">{{year|add:'-1'}}</a>
-{% if year < current_year %}
-&nbsp;<a href="{% url 'dryang-badminton:list-all' %}?p=contrib">Current year</a>
-{% endif %}
-</p>
+{% if p == 'game' or p == 'player' or p == 'cost' or p == 'contrib' %}
+<div><a href="{% url 'dryang-badminton:list-all' %}?p={{p}}&year={{year|add:'-1'}}">{{year|add:'-1'}}</a>
+  {% if year < current_year %}
+&nbsp;<a href="{% url 'dryang-badminton:list-all' %}?p={{p}}">Current year</a>
+  {% endif %}
+</div>
 {% endif %}
 {% endblock %}
