@@ -105,11 +105,11 @@ def list(request):
 
     bal_and_games = get_user_bal_and_games(year, request.user.username)
 
-    data = {'title': 'Friday badminton',
-            'year': year,
+    data = {'title'       : 'Friday badminton',
+            'year'        : year,
             'current_year': date.today().year,
-            'bal': bal_and_games[0],
-            'games': bal_and_games[1]}
+            'my_bal'      : bal_and_games[0],
+            'my_games'    : bal_and_games[1]}
     return render(request, 'badminton/list.html', data)
 
 @login_required(login_url = reverse_lazy('dryang-auth:login'))
@@ -124,20 +124,25 @@ def list_all(request):
         year = int(year)
     logger.debug('Year: %d' % year)
 
-    data = {'title': 'Friday badminton',
-            'p': param,
-            'year': year,
+    data = {'title'       : 'Friday badminton',
+            'p'           : param,
+            'year'        : year,
             'current_year': date.today().year,
-            'bal': get_bal(year),
-            'play_count': get_play_count(year)}
+            'bal'         : get_bal(year),
+            'play_count'  : get_play_count(year),
+            'is_player'   : is_user_in_group_badminton_player(request.user)}
 
-    if 'game' == param:
+    if param == 'game':
         data['games'] = Game.objects.filter(play_date__year = year)
-    elif 'player' == param:
+    elif param == 'player':
         data['players'] = get_players(year)
-    elif 'cost' == param:
+    elif param == 'cost':
         data['costs'] = Cost.objects.filter(financial_year = year)
-    elif 'contrib' == param:
+    elif param == 'contrib':
         data['contribs'] = Contribution.objects.filter(financial_year = year)
+    elif param == 'mybal':
+        bal_and_games = get_user_bal_and_games(year, request.user.username)
+        data['my_bal'] = bal_and_games[0]
+        data['my_games'] = bal_and_games[1]
 
     return render(request, 'badminton/list-all.html', data)

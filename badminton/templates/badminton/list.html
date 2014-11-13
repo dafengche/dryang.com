@@ -2,16 +2,13 @@
 
 {% block main %}
 <h3>My games</h3>
-<div>{{user.first_name}}, you played {{games|length}} game(s) in {{year}}. Your current balance is:
-{% if bal < 0 %}
-<span style='color:red;'>£{{bal|floatformat:'2'}}</span>
-{% else %}
-£{{bal}}
-{% endif %}
-.</div>
+<div>{{user.first_name}}, you played
+{% if my_games %}{{my_games|length}}{% else %}0{% endif %}
+game(s) in {{year}}. Your current balance is:
+{% if my_bal < 0 %}<span style='color:red;'>£{{my_bal|floatformat:'2'}}</span>{% else %}£{{my_bal}}{% endif %}.</div>
 
 <ul>
-  {% for g in games %}
+  {% for g in my_games %}
     <li>{{g.play_date|date:'d M Y'}}
   {% endfor %}
 </ul>
