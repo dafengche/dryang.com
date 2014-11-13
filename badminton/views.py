@@ -21,7 +21,7 @@ def is_user_in_group_badminton_organiser(user):
 
 def get_play_count(year):
     """
-    Return the number of players played games for the given year
+    Return the number of players played games of the given year
     """
     play_count = 0
     games = Game.objects.filter(play_date__year = year)
@@ -30,7 +30,7 @@ def get_play_count(year):
 
 def get_bal(year):
     """
-    Return balance (contributions - costs) for the given year
+    Return balance (contributions - costs) of the given year
     """
     bal = 0.
     contribs = Contribution.objects.filter(financial_year = year)
@@ -41,7 +41,7 @@ def get_bal(year):
 
 def get_players(year):
     """
-    Return a sorted list containing info below for the given year
+    Return a sorted list containing info below of the given year
     (first_name last_name, (play_count, balance))
     """
     games = Game.objects.filter(play_date__year = year)
