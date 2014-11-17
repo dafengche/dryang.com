@@ -1,0 +1,35 @@
+{% extends "common/base.html" %}
+{% load authz %}
+
+{% block css_and_js %}
+<link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}badminton2/css/badminton2.css'/>
+<script type='text/javascript' src='{{ STATIC_URL }}badminton2/js/badminton2.js'></script>
+{% endblock %}
+
+{% block nav%}
+<form>{% csrf_token %}
+  <div>
+    <b>Record:</b>
+    <select id="badminton2_record" class="badminton2_select">
+  {% if user|is_user_in_group:"badminton_organiser" %}
+      <option value="g" selected="selected">Games</option>
+      <option value="p">Players</option>
+      <option value="c">Costs</option>
+      <option value="ctb">Contributions</option>
+  {% endif %}
+  {% if user|is_user_in_group:"badminton_player" %}
+      <option value="b">My balance</option>
+  {% endif %}
+    </select>
+  </div>
+</form>
+{% endblock %}
+
+{% block main %}
+  {% if user|is_user_in_group:"badminton_organiser" %}
+<div>Welcome, organiser {{user.first_name}}!</div>
+  {% endif %}
+  {% if user|is_user_in_group:"badminton_player" %}
+<div>Welcome, player {{user.first_name}}!</div>
+  {% endif %}
+{% endblock %}

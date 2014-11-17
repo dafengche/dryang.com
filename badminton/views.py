@@ -61,7 +61,8 @@ def get_players(year):
     cost_per_play = get_bal(year) / get_play_count(year)
     for (k, v) in player_count.items():
         player_bal[player_name[k]] = (v, cost_per_play * v)
-        contribs = Contribution.objects.filter(financial_year = year).filter(contributor__username = k)
+        contribs = Contribution.objects.filter(financial_year = year) \
+                        .filter(contributor__username = k)
         for c in contribs: player_bal[player_name[k]][0] += c.amount
     return sorted(player_bal.iteritems())
 
@@ -75,9 +76,11 @@ def get_user_bal_and_games(year, username):
 
     # Calculate user' balance
     user_bal = 0.
-    contribs = Contribution.objects.filter(financial_year = year).filter(contributor__username = username)
+    contribs = Contribution.objects.filter(financial_year = year) \
+                        .filter(contributor__username = username)
     for c in contribs: user_bal += c.amount
-    games = Game.objects.filter(play_date__year = year).filter(players__username = username)
+    games = Game.objects.filter(play_date__year = year) \
+                        .filter(players__username = username)
     if len(games) > 0: user_bal += bal / play_count * len(games)
     return (user_bal, games)
 
@@ -85,16 +88,19 @@ def index(request):
     data = {'title': 'Friday badminton'}
     if request.user.is_authenticated():
         if is_user_in_group_badminton_organiser(request.user):
-            logger.debug(request.user.username + ' is a member of group badminton_organiser')
+            logger.debug(request.user.username + \
+                        ' is a member of group badminton_organiser')
             return redirect(reverse('dryang-badminton:list-all'), data)
         elif is_user_in_group_badminton_player(request.user):
-            logger.debug(request.user.username + ' is a member of group badminton_player')
+            logger.debug(request.user.username + \
+                        ' is a member of group badminton_player')
             return redirect(reverse('dryang-badminton:list'), data)
     else:
         return render(request, 'badminton/index.html', data)
 
 @login_required(login_url = reverse_lazy('dryang-auth:login'))
-@user_passes_test(is_user_in_group_badminton_player, login_url = '/auth/access-denied/')
+@user_passes_test(is_user_in_group_badminton_player, \
+login_url = '/auth/access-denied/')
 def list(request):
     year = request.GET.get('year', None)
     if not year: year = date.today().year
@@ -113,7 +119,8 @@ def list(request):
     return render(request, 'badminton/list.html', data)
 
 @login_required(login_url = reverse_lazy('dryang-auth:login'))
-@user_passes_test(is_user_in_group_badminton_organiser, login_url = '/auth/access-denied/')
+@user_passes_test(is_user_in_group_badminton_organiser, \
+login_url = '/auth/access-denied/')
 def list_all(request):
     param = request.GET.get('p', None)
     if not param: param = 'game'

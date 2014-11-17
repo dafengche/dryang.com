@@ -28,7 +28,8 @@ def login(request):
 #            remote_user = request.META['REMOTE_USER']
             remote_user = request.META['HTTP_X_PROXY_REMOTE_USER']
             if remote_user and remote_user != '(null)':
-                logger.debug('Client submitted a certificate\n\t' + remote_user)
+                logger.debug('Client submitted a certificate\n\t' \
+                            + remote_user)
                 user = auth.authenticate(remote_user = remote_user)
                 return login_user(request, user, redirect_url)
         except KeyError:
@@ -48,17 +49,20 @@ def login_user(request, user, redirect_url):
     if user is not None:
         if user.is_active:
             auth.login(request, user)
-            logger.debug(user.username + ' logged in, redirecting to ' + redirect_url + '...')
+            logger.debug(user.username + ' logged in, redirecting to ' \
+                            + redirect_url + '...')
             return redirect(redirect_url)
         else:
             # User account is disabled
             logger.debug(user.username + "'s account is disabled")
             # Go to the login page with warning message
-            return render(request, 'auth/login.html', {'msg': 'You account has been disabled.'})
+            return render(request, 'auth/login.html',
+                            {'msg': 'You account has been disabled.'})
     else:
         # Go to the login page with warning message
         logger.debug('Login failed')
-        return render(request, 'auth/login.html', {'msg': 'Login failed, please try again.'})
+        return render(request, 'auth/login.html',
+                            {'msg': 'Login failed, please try again.'})
 
 # Replaced by TemplateView (see urls.py)
 #def access_denied(request):

@@ -19,11 +19,17 @@ def calc(request):
             args = [a, b]
             kwargs = {}
             try:
-                result = request.broker.execute('services.compute.compute.' + o, *args, **kwargs)
+                result = request.broker.execute('services.compute.compute.' \
+                                    + o, *args, **kwargs)
                 logger.debug('Result: ' + str(result))
-                return HttpResponse(json.dumps(result), content_type = 'application/json')
+                return HttpResponse(
+                                json.dumps(result),
+                                content_type = 'application/json')
             except Exception as ex:
                 logger.error(ex)
-                return HttpResponse(json.dumps({'error': 'Request failed!'}), content_type = 'application/json')
+                return HttpResponse(
+                                json.dumps({'error': 'Request failed!'}),
+                                content_type = 'application/json')
 
-    return HttpResponse(json.dumps({'error': 'Request unsupported!'}), content_type = 'application/json')
+    return HttpResponse(json.dumps({'error': 'Request unsupported!'}),
+                                content_type = 'application/json')

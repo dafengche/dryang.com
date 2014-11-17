@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 
 import json
 import logging
@@ -81,7 +81,8 @@ def get_players_bal(year):
     }
     for (k, v) in player_count.items():
         ctb = 0.
-        contribs = Contribution.objects.filter(financial_year = year).filter(contributor__username = k)
+        contribs = Contribution.objects.filter(financial_year = year) \
+                        .filter(contributor__username = k)
         for c in contribs: ctb += c.amount
         players_bal['player_records'].append({'username': k,
                         'contrib': ctb,
@@ -96,7 +97,8 @@ def get_user_bal(year, username):
      'game_list': [games this player played],
     }
     """
-    games = Game.objects.filter(play_date__year = year).filter(players__username = username)
+    games = Game.objects.filter(play_date__year = year) \
+                        .filter(players__username = username)
     if len(games) == 0: return None
 
     game_dates = []
@@ -105,7 +107,8 @@ def get_user_bal(year, username):
     cost_per_play = get_cost_per_play(year)
 
     ctb = 0.
-    contribs = Contribution.objects.filter(financial_year = year).filter(contributor__username = username)
+    contribs = Contribution.objects.filter(financial_year = year) \
+                        .filter(contributor__username = username)
     for c in contribs: ctb += c.amount
 
     return {'cost_per_play': cost_per_play,
@@ -113,7 +116,18 @@ def get_user_bal(year, username):
             'game_date_list': game_dates}
 
 def index(request):
-    return render(request, 'badminton2/index.html', {'title': 'Friday badminton'})
+    if request.user.is_authenticated():
+        logger.debug('User is authenticated')
+        if is_user_in_group(request.user, 'badminton_organiser') or \
+                    is_user_in_group(request.user, 'badminton_player'):
+            return render(request, 'badminton2/badminton.html',
+                    {'title': 'Friday badminton'})
+        else:
+            return redirect(reverse('dryang-auth:access-denied'),
+                    {'title': 'Friday badminton'})
+    else:
+        return render(request, 'badminton2/index.html',
+                    {'title': 'Friday badminton'})
 
 @login_required(login_url = reverse_lazy('dryang-auth:login'))
 def get_data(request):
@@ -121,23 +135,34 @@ def get_data(request):
         if request.method == 'POST':
             params = json.loads(request.body)
             logger.debug('Parameters: ' + str(params))
-            if not 'r' in params: return HttpResponse(json.dumps({'error': "Parameter 'r' not found!"}), content_type = 'application/json')
-            if not 'y' in params: return HttpResponse(json.dumps({'error': "Parameter 'y' not found!"}), content_type = 'application/json')
+            if not 'r' in params:
+                return HttpResponse(
+                    json.dumps({'error': "Parameter 'r' not found!"}),
+                    content_type = 'application/json')
+            if not 'y' in params: return HttpResponse(
+                    json.dumps({'error': "Parameter 'y' not found!"}),
+                    content_type = 'application/json')
             r = params['r']
             y = params['y']
             if r not in ['b', 'g', 'p', 'c', 'ctb']:
-                return HttpResponse(json.dumps({'error': 'Unsupported parameter r: ' + r}), content_type = 'application/json')
+                return HttpResponse(
+                    json.dumps({'error': 'Unsupported parameter r: ' + r}),
+                    content_type = 'application/json')
 
             data = None
             if r == 'b':
                 if not is_user_in_group(request.user, 'badminton_player'):
                     logger.warning('%s is not a member of group badminton_player' % request.user.username)
-                    return HttpResponse(json.dumps({'error': 'Access denied'}), content_type = 'application/json')
+                    return HttpResponse(
+                        json.dumps({'error': 'Access denied'}),
+                        content_type = 'application/json')
                 data = get_user_bal(y, request.user.username) 
             else:
                 if not is_user_in_group(request.user, 'badminton_organiser'):
                     logger.warning('%s is not a member of group badminton_organiser' % request.user.username)
-                    return HttpResponse(json.dumps({'error': 'Access denied'}), content_type = 'application/json')
+                    return HttpResponse(
+                        json.dumps({'error': 'Access denied'}),
+                        content_type = 'application/json')
                 if r == 'g':
                     data = Game.objects.filter(play_date__year = y)
                 elif r == 'p':
@@ -148,6 +173,10 @@ def get_data(request):
                     data = Contribution.objects.filter(financial_year = y)
 
             if data: logger.debug(data)
-            return HttpResponse(json.dumps({'data': data}), content_type = 'application/json')
+            return HttpResponse(
+                json.dumps({'data': data}),
+                content_type = 'application/json')
 
-    return HttpResponse(json.dumps({'error': 'Request failed!'}), content_type = 'application/json')
+    return HttpResponse(
+            json.dumps({'error': 'Request failed!'}),
+            content_type = 'application/json')
