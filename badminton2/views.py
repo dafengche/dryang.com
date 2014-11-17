@@ -54,6 +54,8 @@ def get_players_bal(year):
     {'cost_per_play': cost per play,
      'player_records' [
         {'username': username,
+         'first_name': first_name,
+         'last_name': last_name,
          'contrib': contributions this player made,
          'game_date_list': [games this player played],
         },
@@ -69,9 +71,10 @@ def get_players_bal(year):
     for g in games:
         players = g.players.all()
         for p in players:
-            if p.username not in player_count:
-                player_count[p.username] = []
-            player_count[p.username].append(g.play_date)
+            if p not in player_count:
+                player_count[p] = []
+#            player_count[p].append(g.play_date) # Non-serializable
+            player_count[p].append(g.play_date.isoformat())
 
     cost_per_play = get_cost_per_play(year)
     
@@ -82,14 +85,14 @@ def get_players_bal(year):
     for (k, v) in player_count.items():
         ctb = 0.
         contribs = Contribution.objects.filter(financial_year = year) \
-                        .filter(contributor__username = k)
+                        .filter(contributor__username = k.username)
         for c in contribs: ctb += c.amount
-        players_bal['player_records'].append({'username': k,
-                        'contrib': ctb,
-                        'game_date_list': v})
+        d = k.as_json()
+        d.update({'contrib': ctb, 'game_date_list': v})
+        players_bal['player_records'].append(d)
     return players_bal
 
-def get_user_bal(year, username):
+def get_player_bal(year, username):
     """
     Return a list of info below for a given user in a given year
     {'cost_per_play': cost per play,
@@ -101,8 +104,8 @@ def get_user_bal(year, username):
                         .filter(players__username = username)
     if len(games) == 0: return None
 
-    game_dates = []
-    for g in games: game_dates.append(g.play_date)
+#    game_dates = [g.play_date for g in games] # Non-serializable
+    game_dates = [g.play_date.isoformat() for g in games]
 
     cost_per_play = get_cost_per_play(year)
 
@@ -152,26 +155,32 @@ def get_data(request):
             data = None
             if r == 'b':
                 if not is_user_in_group(request.user, 'badminton_player'):
-                    logger.warning('%s is not a member of group badminton_player' % request.user.username)
+                    logger.warning('%s is not a member of group \
+                        badminton_player' % request.user.username)
                     return HttpResponse(
                         json.dumps({'error': 'Access denied'}),
                         content_type = 'application/json')
-                data = get_user_bal(y, request.user.username) 
+                data = get_player_bal(y, request.user.username) 
             else:
                 if not is_user_in_group(request.user, 'badminton_organiser'):
-                    logger.warning('%s is not a member of group badminton_organiser' % request.user.username)
+                    logger.warning('%s is not a member of group \
+                        badminton_organiser' % request.user.username)
                     return HttpResponse(
                         json.dumps({'error': 'Access denied'}),
                         content_type = 'application/json')
                 if r == 'g':
                     data = Game.objects.filter(play_date__year = y)
+                    data = [g.as_json() for g in data]
                 elif r == 'p':
                     data = get_players_bal(y)
                 elif r == 'c':
                     data = Cost.objects.filter(financial_year = y)
+                    data = [c.as_json() for c in data]
                 else: # ctb
                     data = Contribution.objects.filter(financial_year = y)
+                    data = [c.as_json() for c in data]
 
+            # At this point, data should be JSON serialisable
             if data: logger.debug(data)
             return HttpResponse(
                 json.dumps({'data': data}),
