@@ -4,6 +4,9 @@
 {% block css_and_js %}
 <link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}badminton2/css/badminton2.css'/>
 <script type='text/javascript' src='{{ STATIC_URL }}badminton2/js/badminton2.js'></script>
+<!--[if lte IE 8]><script language='javascript' type='text/javascript' src='{{ STATIC_URL }}common/flot-0.8.3/excanvas.min.js'></script><![endif]-->
+<script type='text/javascript' src='{{ STATIC_URL }}common/flot-0.8.3/jquery.flot.min.js'></script>
+<script type='text/javascript' src='{{ STATIC_URL }}common/flot-0.8.3/jquery.flot.time.min.js'></script>
 {% endblock %}
 
 {% block nav%}
@@ -26,10 +29,6 @@
 {% endblock %}
 
 {% block main %}
-  {% if user|is_user_in_group:"badminton_organiser" %}
-<div>Welcome, organiser {{user.first_name}}!</div>
-  {% endif %}
-  {% if user|is_user_in_group:"badminton_player" %}
-<div>Welcome, player {{user.first_name}}!</div>
-  {% endif %}
+<div id='badminton2_msg'></div>
+<div id='badminton2_plot'></div>
 {% endblock %}

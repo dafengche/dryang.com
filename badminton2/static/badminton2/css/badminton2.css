@@ -2,3 +2,11 @@
   width : 10em;
   margin: 0.2em;
 }
+
+#badminton2_msg {
+}
+
+#badminton2_plot {
+  width : 600px;
+  height: 400px;
+}
