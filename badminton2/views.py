@@ -57,7 +57,7 @@ def get_players_bal(year):
          'first_name': first_name,
          'last_name': last_name,
          'contrib': contributions this player made,
-         'game_date_list': [games this player played],
+         'game_dates': [games this player played],
         },
         {
         }
@@ -88,7 +88,7 @@ def get_players_bal(year):
                         .filter(contributor__username = k.username)
         for c in contribs: ctb += c.amount
         d = k.as_json()
-        d.update({'contrib': ctb, 'game_date_list': v})
+        d.update({'contrib': ctb, 'game_dates': v})
         players_bal['player_records'].append(d)
     return players_bal
 
@@ -116,7 +116,7 @@ def get_player_bal(year, username):
 
     return {'cost_per_play': cost_per_play,
             'contrib': ctb,
-            'game_date_list': game_dates}
+            'game_dates': game_dates}
 
 def index(request):
     if request.user.is_authenticated():

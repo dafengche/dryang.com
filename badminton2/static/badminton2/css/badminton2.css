@@ -3,6 +3,14 @@
   margin: 0.2em;
 }
 
+.badminton2_pie_label {
+  border    : 1px solid grey;
+  font-size : 8pt;
+  text-align: center;
+  padding   : 5px;
+  color     : white;
+}
+
 #badminton2_msg {
 }
 
