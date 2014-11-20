@@ -18,3 +18,12 @@
   width : 600px;
   height: 400px;
 }
+
+#badminton2_tooltip {
+  position        : absolute;
+  display         : none;
+  padding         : 3px;
+  font-size       : 9px;
+  background-color: #FFFFFF;
+  opacity         : 0.8;
+}

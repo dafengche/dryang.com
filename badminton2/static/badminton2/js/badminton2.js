@@ -79,7 +79,7 @@ $(function() {
             }
           };
           $.plot(container, dataset, options);
-          container.useTooltip();
+          container.useTooltip(r);
         } else if (r === 'p') { // Players
           var data = [], ticks = [];
           var idx = 0;
@@ -88,6 +88,7 @@ $(function() {
             ticks.push([idx, v['first_name']]);
             idx++;
           });
+          // TODO: Sort by first_name
 //          console.log(data);
 //          console.log(ticks);
           var dataset = [{data: data}];
@@ -110,7 +111,7 @@ $(function() {
             }
           };
           $.plot(container, dataset, options);
-          container.useBarTooltip();
+          container.useTooltip(r);
         } else if (r === 'c' || r === 'ctb') { // Costs or contributions
           var data = {}
           $.each(result['data'], function(k, v) {
@@ -144,11 +145,17 @@ $(function() {
                 }
               }
             },
+            grid: {
+              hoverable: true,
+              clickable: true,
+              borderWidth: 2
+            },
             legend: {
               show: false
             }
           };
           $.plot(container, dataset, options);
+//          container.useDlg(r);
         } else if (r === 'b') { // My balance
           var data = [];
           $.each(result['data']['game_dates'], function(k, v) {
@@ -166,7 +173,14 @@ $(function() {
 //              show: true
 //            },
             xaxis: {
-              mode: 'time'
+              mode: 'time',
+              tickLength: 0
+            },
+            yaxis: {
+              min: 0,
+              max: 1.5,
+              tickLength: 0,
+              ticks: false
             },
             grid: {
               hoverable        : true,
@@ -177,6 +191,7 @@ $(function() {
             }
           };
           $.plot(container, dataset, options);
+          container.useTooltip(r);
         }
       },
       error: function(result) {
@@ -191,69 +206,67 @@ $(function() {
     return '<div class="badminton2_pie_label">'
       + label + ': ' + series.percent.toFixed(2) + '%, £'
       + series.data[0][1].toFixed(2) + '</div>';
+//      + label + ': ' + series.percent.toFixed(2) + '%'
   }
 
   var previousPoint = null, previousLabel = null;
+  var month = new Array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
+    'Sep', 'Oct', 'Nov', 'Dec');
 
-  $.fn.useBarTooltip = function() {
+  $.fn.useTooltip = function(r) {
     $(this).bind('plothover', function(event, pos, item) {
       if (item) {
-        if (previousLabel != item.series.label || previousPoint != item.dataIndex) {
-          previousPoint = item.dataIndex;
-          previousLabel = item.series.label;
-          $('#badminton2_tooltip').remove();
+        if (r === 'g' || r === 'p' || r === 'b') {
+          if (previousLabel != item.series.label || previousPoint != item.dataIndex) {
+            previousPoint = item.dataIndex;
+            previousLabel = item.series.label;
+            $('#badminton2_tooltip').remove();
 
-          var x = item.datapoint[0];
-          var y = item.datapoint[1];
-          var color = item.series.color;
+            var x = item.datapoint[0];
+            var y = item.datapoint[1];
+            var color = item.series.color;
 
-          showTooltip(item.pageX, item.pageY, color,
-            '<strong>' + item.series.xaxis.ticks[x].label
-            + ': played ' + y + ' game(s)</strong>');
+            if (r === 'g') {
+              var dt = new Date(x);
+              showTooltip(item.pageX, item.pageY - 30, color,
+                '<strong>' + dt.getDate() + ' ' + month[dt.getMonth()] + ' '
+                + dt.getFullYear() + ': ' + y + ' players</strong>');
+            } else if (r === 'p') { // Bar chart
+              showTooltip(item.pageX, item.pageY - 30, color,
+                '<strong>' + item.series.xaxis.ticks[x].label
+                + ': played ' + y + ' game(s)</strong>');
+            } else { // r = 'b'
+              var dt = new Date(x);
+              showTooltip(item.pageX, item.pageY - 30, color,
+                '<strong>' + dt.getDate() + ' ' + month[dt.getMonth()] + ' '
+                + dt.getFullYear() + '</strong>');
+            }
+          }
         }
       } else {
         $('#badminton2_tooltip').remove();
         previousPoint = null;
       }
     });
-  };
-
-  $.fn.useTooltip = function() {
-    $(this).bind('plothover', function(event, pos, item) {
-      if (item) {
-        if (previousLabel != item.series.label || previousPoint != item.dataIndex) {
-          previousPoint = item.dataIndex;
-          previousLabel = item.series.label;
-          $('#badminton2_tooltip').remove();
-
-          var x = item.datapoint[0];
-          var y = item.datapoint[1];
-          var color = item.series.color;
-
-          var dt = new Date(x);
-
-          showTooltip(item.pageX, item.pageY, color,
-            '<strong>' + dt.getDate() + '-' + dt.getMonth() + '-'
-            + dt.getFullYear() + ': ' + y + ' players</strong>');
-        }
-      } else {
-        $('#badminton2_tooltip').remove();
-        previousPoint = null;
-      }
-    });
-  };
+  }
 
   function showTooltip(x, y, color, contents) {
     $('<div id="badminton2_tooltip">' + contents + '</div>').css({
-      'position': 'absolute',
-      'display': 'none',
-      'top': y - 30,
+      'top': y,
       'left': x,
-      'border': '2px solid ' + color,
-      'padding': '3px',
-      'font-size': '9px',
-      'background-color': '#FFFFFF',
-      'opacity': 0.9
+      'border': '2px solid ' + color
     }).appendTo('body').fadeIn(200);
   }
+
+  $.fn.useDlg = function(r) {
+    $(this).bind('plotclick', function(event, pos, item) {
+      if (item) {
+        if (r === 'c' || r === 'ctb') { // Pie chart
+          var msg = item.series.label + ': £' + item.series.data[0][1].toFixed(2);
+          alert(msg);
+        }
+      }
+    });
+  }
+
 });
