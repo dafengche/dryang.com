@@ -38,7 +38,8 @@ $(function() {
 
   function getData(params) {
     console.log(params);
-    var msg = $('#badminton2_msg');
+    var title = $('#badminton2_title').html('<h3>' + params['y'] + '</h3>');
+    var msg = $('#badminton2_msg').html('');
     var container = $('#badminton2_plot');
     var r = $('#badminton2_record').val();
     $.ajax({
@@ -56,10 +57,17 @@ $(function() {
         container.unbind();
         if (r === 'g') { // Games
           var data = [];
+          var totalPlayerCount = 0;
           $.each(result['data'], function(k, v) {
             data.push([new Date(v['date']).getTime(), v['players'].length]);
+            totalPlayerCount += v['players'].length;
           });
 //          console.log(data);
+          msg.html('Game(s) played: ' + data.length
+            + ', Player count: ' + totalPlayerCount
+            + ', ' + (totalPlayerCount / data.length).toFixed(2)
+            + ' players/game');
+
           var dataset = [{
             data  : data,
             color : '#0062E3',
@@ -162,6 +170,17 @@ $(function() {
             data.push([new Date(v).getTime(), 1]);
           });
 //          console.log(data);
+          var costPerPlay = result['data']['cost_per_play'];
+          var contrib = result['data']['contrib'];
+          var bal = contrib - costPerPlay * data.length;
+          msg.html('Game(s) I played: ' + data.length
+            + ', cost per play: £' + costPerPlay.toFixed(2)
+            + '<br/>My contribution: £' + contrib.toFixed(2)
+            + ', my balance: '
+            + (bal < 0.
+              ? '<font color="red">£' + bal.toFixed(2) + '</font>'
+              : '£' + bal.toFixed(2)));
+
           var dataset = [{
             data  : data,
             color : '#0062E3',
