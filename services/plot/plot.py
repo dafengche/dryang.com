@@ -85,18 +85,15 @@ def _make_plot(params):
 #        sw_lon = -31.266001
 #        ne_lat = 81.008797
 #        ne_lon = 39.869301
-        if 'sw_lat' in params:
-            sw_lat = params['sw_lat']
-        if 'sw_lon' in params:
-            sw_lon = params['sw_lon']
-        if 'ne_lat' in params:
-            ne_lat = params['ne_lat']
-        if 'ne_lon' in params:
-            ne_lon = params['ne_lon']
+        if 'sw_lat' in params: sw_lat = params['sw_lat']
+        if 'sw_lon' in params: sw_lon = params['sw_lon']
+        if 'ne_lat' in params: ne_lat = params['ne_lat']
+        if 'ne_lon' in params: ne_lon = params['ne_lon']
         logger.debug('(sw_lat, sw_lon): (' + str(sw_lat) + ', ' + str(sw_lon) + ')')
         logger.debug('(ne_lat, ne_lon): (' + str(ne_lat) + ', ' + str(ne_lon) + ')')
 
         # Retrieve data from database
+        # TODO: Get obs and mod values
         query = None
         if dataset == 'emep':
             query = ('SELECT id, station_latitude_deg, station_longitude_deg '
