@@ -1,4 +1,10 @@
 $(function() {
+  var r = undefined, y = undefined;
+
+  var previousPoint = null, previousLabel = null;
+  var month = new Array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
+    'Sep', 'Oct', 'Nov', 'Dec');
+
   $.ajaxSetup({
     beforeSend: function(xhr, settings) {
       function getCookie(name) {
@@ -22,39 +28,64 @@ $(function() {
     }
   });
 
-  $('#badminton2_record').on('change', function() {
-    var r = $(this).val();
-    var params = {'r': r, 'y': 2014};
-    getData(params);
-  });
-
-  // Init
   init();
 
+  $('#badminton2_record').on('change', function() {
+    r = $(this).val();
+    getData({'r': r, 'y': y});
+  });
+
   function init() {
-    getData({'r': $('#badminton2_record').val(), 'y': new Date().getFullYear()});
-    
+    r = $('#badminton2_record').val();
+    y = new Date().getFullYear();
+    getData({'r': r, 'y': y});
   }
 
   function getData(params) {
-    console.log(params);
+//    console.log(params);
     var title = $('#badminton2_title').html('<h3>' + params['y'] + '</h3>');
     var msg = $('#badminton2_msg').html('');
     var container = $('#badminton2_plot');
-    var r = $('#badminton2_record').val();
+    var controls = $('#badminton2_controls').empty();
+    var links = $('#badminton2_links').empty();
     $.ajax({
       url: 'get-data/',
       type: 'post',
       dataType: 'json',
       data: JSON.stringify(params),
       success: function(result) {
+        // Links
+        // Link 1: Previous year
+        $('<a href="">' + (y - 1) + '</a>')
+          .on('click', function(e) {
+            e.preventDefault();
+            y -= 1;
+            getData({'r': r, 'y': y});
+          }).appendTo(links);
+        // Link 2: Current year
+        if (y != new Date().getFullYear()) {
+          links.append('\xA0');
+          $('<a href="">Current year</a>')
+            .on('click', function(e) {
+              e.preventDefault();
+              y = new Date().getFullYear();
+              getData({'r': r, 'y': y});
+            }).appendTo(links);
+        }
+
         if (result['error']) {
-//          container.zoomableImage('update', STATIC_URL + 'common/images/failed.jpg');
-          console.log('ERROR!');
+          msg.html(result['error']);
+          container.hide();
           return;
         }
-        console.log(result);
-        container.unbind();
+
+        if (result['data'] == null || result['data'].length === 0) {
+          container.hide();
+          return;
+        }
+
+//        console.log(result);
+        container.show().unbind();
         if (r === 'g') { // Games
           var data = [];
           var totalPlayerCount = 0;
@@ -67,59 +98,42 @@ $(function() {
             + ', Player count: ' + totalPlayerCount
             + ', ' + (totalPlayerCount / data.length).toFixed(2)
             + ' players/game');
-
-          var dataset = [{
-            data  : data,
-            color : '#0062E3',
-            points: {fillColor: '#0062E3', show: true},
-            lines : {show: true}
-          }];
-          var options = {
-            xaxis: {
-              mode: 'time'
-            },
-            grid: {
-              hoverable        : true,
-              borderWidth      : 3,
-              mouseActiveRadius: 50,
-              backgroundColor  : {colors: ['#FFFFFF', '#EDF5FF']},
-              axisMargin       : 20
-            }
-          };
-          $.plot(container, dataset, options);
-          container.useTooltip(r);
+          plotGames(container, data);
         } else if (r === 'p') { // Players
-          var data = [], ticks = [];
-          var idx = 0;
+          var sortableData = [];
+          var sortByFirstName = true;
           $.each(result['data']['player_records'], function(k, v) {
-            data.push([idx, v['game_dates'].length]);
-            ticks.push([idx, v['first_name']]);
-            idx++;
+            sortableData.push([v['first_name'], v['game_dates'].length]);
           });
-          // TODO: Sort by first_name
+          // Sort by first_name
+          sortableData.sort();
+
+          var data = [], ticks = [];
+          $.each(sortableData, function(idx, v) {
+            data.push([idx, v[1]]);
+            ticks.push([idx, v[0]]);
+          });
 //          console.log(data);
 //          console.log(ticks);
-          var dataset = [{data: data}];
-          var options = {
-            series: {
-              bars: {
-                show: true
+          plotPlayers(container, data, ticks);
+
+          $('<input type="button" value="Sort"/>')
+            .on('click', function() {
+              if (sortByFirstName) { // Sort by games played
+                sortableData.sort(function(v1, v2) {return v1[1] - v2[1]});
+                sortByFirstName = false;
+              } else { // Sort by first name
+                sortableData.sort();
+                sortByFirstName = true;
               }
-            },
-            bars: {
-              align: "center",
-              barWidth: 0.5
-            },
-            xaxis: {
-              ticks: ticks
-            },
-            grid: {
-              hoverable: true,
-              borderWidth: 2
-            }
-          };
-          $.plot(container, dataset, options);
-          container.useTooltip(r);
+//              console.log(sortableData);
+              data = [], ticks = [];
+              $.each(sortableData, function(idx, v) {
+                data.push([idx, v[1]]);
+                ticks.push([idx, v[0]]);
+              });
+              plotPlayers(container, data, ticks);
+           }).appendTo(controls);
         } else if (r === 'c' || r === 'ctb') { // Costs or contributions
           var data = {}
           $.each(result['data'], function(k, v) {
@@ -130,41 +144,8 @@ $(function() {
               data[v['type']['name']] += v['amount'];
           });
 //          console.log(data);
-          var dataset = [];
-          $.each(data, function(k, v) {
-            dataset.push({
-              label: k,
-              data : v
-            });
-          });
-//          console.log(dataset);
-          var options = {
-            series: {
-              pie: {
-                show: true,
-                label: {
-                  show: true,
-                  radius: 0.8,
-                  formatter: pieLabelFormatter,
-                  background: {
-                    opacity: 0.8,
-                    color  : '#000'
-                  }
-                }
-              }
-            },
-            grid: {
-              hoverable: true,
-              clickable: true,
-              borderWidth: 2
-            },
-            legend: {
-              show: false
-            }
-          };
-          $.plot(container, dataset, options);
-//          container.useDlg(r);
-        } else if (r === 'b') { // My balance
+          plotCostsOrContribs(container, data);
+       } else if (r === 'b') { // User's balance
           var data = [];
           $.each(result['data']['game_dates'], function(k, v) {
             data.push([new Date(v).getTime(), 1]);
@@ -180,42 +161,13 @@ $(function() {
             + (bal < 0.
               ? '<font color="red">£' + bal.toFixed(2) + '</font>'
               : '£' + bal.toFixed(2)));
-
-          var dataset = [{
-            data  : data,
-            color : '#0062E3',
-            points: {fillColor: '#0062E3', show: true},
-            lines : {show: false}
-          }];
-          var options = {
-//            bars: {
-//              show: true
-//            },
-            xaxis: {
-              mode: 'time',
-              tickLength: 0
-            },
-            yaxis: {
-              min: 0,
-              max: 1.5,
-              tickLength: 0,
-              ticks: false
-            },
-            grid: {
-              hoverable        : true,
-              borderWidth      : 3,
-              mouseActiveRadius: 50,
-              backgroundColor  : {colors: ['#FFFFFF', '#EDF5FF']},
-              axisMargin       : 20
-            }
-          };
-          $.plot(container, dataset, options);
-          container.useTooltip(r);
+          plotUserBal(container, data);
         }
+
       },
       error: function(result) {
-//        container.zoomableImage('update', STATIC_URL + 'common/images/failed.jpg');
-        console.log('ERROR!');
+        msg.html(result);
+        container.hide();
       }
     });
   }
@@ -228,11 +180,7 @@ $(function() {
 //      + label + ': ' + series.percent.toFixed(2) + '%'
   }
 
-  var previousPoint = null, previousLabel = null;
-  var month = new Array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
-    'Sep', 'Oct', 'Nov', 'Dec');
-
-  $.fn.useTooltip = function(r) {
+  $.fn.useTooltip = function() {
     $(this).bind('plothover', function(event, pos, item) {
       if (item) {
         if (r === 'g' || r === 'p' || r === 'b') {
@@ -277,7 +225,7 @@ $(function() {
     }).appendTo('body').fadeIn(200);
   }
 
-  $.fn.useDlg = function(r) {
+  $.fn.useDlg = function() {
     $(this).bind('plotclick', function(event, pos, item) {
       if (item) {
         if (r === 'c' || r === 'ctb') { // Pie chart
@@ -286,6 +234,123 @@ $(function() {
         }
       }
     });
+  }
+
+  function plotGames(container, data) {
+    var dataset = [{
+      data  : data,
+      color : '#0062E3',
+      points: {fillColor: '#0062E3', show: true},
+      lines : {show: true}
+    }];
+    var options = {
+      xaxis: {
+        mode: 'time'
+      },
+      grid: {
+        hoverable        : true,
+        borderWidth      : 3,
+        mouseActiveRadius: 50,
+        backgroundColor  : {colors: ['#FFFFFF', '#EDF5FF']},
+        axisMargin       : 20
+      }
+    };
+    $.plot(container, dataset, options);
+    container.useTooltip();
+  }
+
+  function plotPlayers(container, data, ticks) {
+    var dataset = [{data: data}];
+    var options = {
+      series: {
+        bars: {
+          show: true
+        }
+      },
+      bars: {
+        align   : "center",
+        barWidth: 0.5
+      },
+      xaxis: {
+        ticks: ticks
+      },
+      grid: {
+        hoverable  : true,
+        borderWidth: 2
+      }
+    };
+    $.plot(container, dataset, options);
+    container.useTooltip();
+  }
+
+  function plotCostsOrContribs(container, data) {
+    var dataset = [];
+    $.each(data, function(k, v) {
+      dataset.push({
+        label: k,
+        data : v
+      });
+    });
+//    console.log(dataset);
+    var options = {
+      series: {
+        pie: {
+          show : true,
+          label: {
+            show      : true,
+            radius    : 0.8,
+            formatter : pieLabelFormatter,
+            background: {
+              opacity: 0.8,
+              color  : '#000'
+            }
+          }
+        }
+      },
+      grid: {
+        hoverable  : true,
+        clickable  : true,
+        borderWidth: 2
+      },
+      legend: {
+        show: false
+      }
+    };
+    $.plot(container, dataset, options);
+//    container.useDlg();
+  }
+
+  function plotUserBal(container, data) {
+    var dataset = [{
+      data  : data,
+      color : '#0062E3',
+      points: {fillColor: '#0062E3', show: true},
+      lines : {show: false}
+    }];
+    var options = {
+//      bars: {
+//        show: true
+//      },
+      xaxis: {
+        mode: 'time',
+        tickLength: 0
+      },
+      yaxis: {
+        min: 0,
+        max: 1.5,
+        tickLength: 0,
+        ticks: false
+      },
+      grid: {
+        hoverable        : true,
+        borderWidth      : 3,
+        mouseActiveRadius: 50,
+        backgroundColor  : {colors: ['#FFFFFF', '#EDF5FF']},
+        axisMargin       : 20
+      }
+    };
+    $.plot(container, dataset, options);
+    container.useTooltip();
   }
 
 });
