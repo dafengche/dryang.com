@@ -39,13 +39,15 @@
           var startX, startY;
           var x1, x2, y1, y2;
 
-          el.on('mouseenter', function(e) {
+          // Notice the off() methods to avoid event been triggered multiple
+          // times. Without off(), each time a new handler is attached
+          el.off('mouseenter').on('mouseenter', function(e) {
             e.preventDefault();
             el.css('cursor', 'crosshair');
-          }).on('mouseleave', function(e) {
+          }).off('mouseleave').on('mouseleave', function(e) {
             e.preventDefault();
             el.css('cursor', 'default');
-          }).on('mousedown', function(e) {
+          }).off('mousedown').on('mousedown', function(e) {
             e.preventDefault();
             drag = true;
             startX = e.pageX, startY = e.pageY;
@@ -63,7 +65,7 @@
             var xy = getXY(startX - offset.left, startY - offset.top, o.metadata);
             x1 = xy[0], y1 = xy[1];
 //            console.log('-> (' + x1 + ', ' + y1 + ')');
-          }).on('mousemove', function(e) {
+          }).off('mousemove').on('mousemove', function(e) {
             e.preventDefault();
             if (drag) { // Draw a rectangle
               var endX = e.pageX, endY = e.pageY;
@@ -83,7 +85,7 @@
                 'opacity'         : 0.5
               });
             }
-          }).on('mouseup', function(e) {
+          }).off('mouseup').on('mouseup', function(e) {
             e.preventDefault();
             drag = false;
             var endX = e.pageX, endY = e.pageY;
