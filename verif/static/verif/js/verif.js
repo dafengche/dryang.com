@@ -103,8 +103,6 @@ $(function() {
   $('#verif_plot_btn').on('click', function(e) {
     e.preventDefault();
 
-    $(this).attr('disabled', 'disabled');
-
     var dataset = $('#verif_dataset').val();
     var pt = 'time_series';
     if ('boe' != dataset) {
@@ -128,7 +126,7 @@ $(function() {
     else
       container.zoomableImage('option', 'zoomable', false);
 
-    $('#verif_plot_btn').attr('disabled', 'disabled');
+    $('#verif_plot_btn').prop('disabled', true);
     $('#verif_container').zoomableImage('update', STATIC_URL + 'common/images/loading.gif');
 
     $.ajax({
@@ -155,13 +153,13 @@ $(function() {
         container.zoomableImage('update', STATIC_URL + 'common/images/failed.jpg');
       },
       complete: function() {
-        $('#verif_plot_btn').removeAttr('disabled');
+        $('#verif_plot_btn').prop('disabled', false);
       }
     });
   }
 
   function getStations(dataset) {
-    $('#verif_plot_btn').attr('disabled', 'disabled');
+    $('#verif_plot_btn').prop('disabled', true);
     var msg = $('#verif_msg').text('');
     $.ajax({
       url: 'get-stations/',
@@ -186,7 +184,7 @@ $(function() {
         }
       },
       complete: function() {
-        $('#verif_plot_btn').removeAttr('disabled');
+        $('#verif_plot_btn').prop('disabled', false);
       }
     });
   }
