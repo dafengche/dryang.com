@@ -69,19 +69,19 @@ $(function() {
 
   $('#verif_dataset').on('change', function() {
     var dataset = $(this).val();
-
+    var stnFinder = $('#verif_stn_finder');
     if (dataset === 'emep') {
       $('#verif_plot_type_block').show();
       // Station finder widget
-      if ($('#verif_stn_finder').hasClass('station-finder'))
-        $('#verif_stn_finder').stationFinder('option', 'dataset', dataset).stationFinder('open');
+      if (stnFinder.hasClass('verif-station-finder'))
+        stnFinder.stationFinder('option', 'dataset', dataset).stationFinder('open');
       else // New instance
-        $('#verif_stn_finder').stationFinder({'dataset': dataset});
+        stnFinder.stationFinder({'dataset': dataset});
     } else {
       // Hide the search icon, station finder widget
       $('.verif-stn-search').remove();
-      if ($('#verif_stn_finder').hasClass('station-finder'))
-        $('#verif_stn_finder').stationFinder('close');
+      if (stnFinder.hasClass('verif-station-finder'))
+        stnFinder.stationFinder('close');
 
       if (dataset === 'gaw') {
         $('#verif_plot_type_block').show();
