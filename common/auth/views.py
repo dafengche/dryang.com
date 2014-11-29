@@ -25,6 +25,7 @@ def login(request):
         return login_user(request, user, redirect_url)
     else:
         try:
+#            logger.debug(request.META)
 #            remote_user = request.META['REMOTE_USER']
             remote_user = request.META['HTTP_X_PROXY_REMOTE_USER']
             if remote_user and remote_user != '(null)':
