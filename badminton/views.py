@@ -95,8 +95,11 @@ def index(request):
             logger.debug(request.user.username + \
                         ' is a member of group badminton_player')
             return redirect(reverse('dryang-badminton:list'), data)
-    else:
-        return render(request, 'badminton/index.html', data)
+        else:
+            data['msg'] = 'Sorry, ' + request.user.first_name + \
+                        ', you are not allowed to view the page!'
+
+    return render(request, 'badminton/index.html', data)
 
 @login_required(login_url = reverse_lazy('dryang-auth:login'))
 @user_passes_test(is_user_in_group_badminton_player, \
