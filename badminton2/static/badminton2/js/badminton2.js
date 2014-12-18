@@ -102,8 +102,17 @@ $(function() {
         } else if (r === 'p') { // Players
           var sortableData = [];
           var sortByFirstName = true;
+          var costPerPlay = result['data']['cost_per_play'];
           $.each(result['data']['player_records'], function(k, v) {
             sortableData.push([v['first_name'], v['game_dates'].length]);
+            // TODO: Show each player's balance as a tooltip
+            console.log(v['first_name']);
+            console.log('\tPlayed ' + v['game_dates'].length + ' game(s)');
+            var cost = v['game_dates'].length * costPerPlay;
+            console.log('\tCost: £' + cost.toFixed(2));
+            console.log('\tContrib: £' + v['contrib'].toFixed(2));
+            var bal = v['contrib'] - cost;
+            console.log('\tBalance: £' + bal.toFixed(2));
           });
           // Sort by first_name
           sortableData.sort();
