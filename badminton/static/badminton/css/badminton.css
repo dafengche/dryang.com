@@ -1,9 +1,9 @@
-.badminton2_select {
+.badminton_select {
   width : 10em;
   margin: 0.2em;
 }
 
-.badminton2_pie_label {
+.badminton_pie_label {
   border    : 1px solid grey;
   font-size : 8pt;
   text-align: center;
@@ -11,27 +11,27 @@
   color     : white;
 }
 
-#badminton2_title {
+#badminton_title {
 }
 
-#badminton2_title h3 {
+#badminton_title h3 {
 }
 
-#badminton2_links {
+#badminton_links {
 }
 
-#badminton2_links a {
+#badminton_links a {
 }
 
-#badminton2_msg {
+#badminton_msg {
 }
 
-#badminton2_plot {
+#badminton_plot {
   width : 640px;
   height: 400px;
 }
 
-#badminton2_tooltip {
+#badminton_tooltip {
   position        : absolute;
   display         : none;
   padding         : 3px;

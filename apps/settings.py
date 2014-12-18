@@ -42,7 +42,6 @@ INSTALLED_APPS = (
     'demo',
     'verif',
     'badminton',
-    'badminton2',
 )
 
 # django.contrib.auth.middleware.RemoteUserMiddleware added, 30OCT14
@@ -152,10 +151,6 @@ LOGGING = {
 #            'level': 'DEBUG',
 #        },
         'badminton': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-        },
-        'badminton2': {
             'handlers': ['console'],
             'level': 'DEBUG',
         },

@@ -30,24 +30,24 @@ $(function() {
 
   init();
 
-  $('#badminton2_record').on('change', function() {
+  $('#badminton_record').on('change', function() {
     r = $(this).val();
     getData({'r': r, 'y': y});
   });
 
   function init() {
-    r = $('#badminton2_record').val();
+    r = $('#badminton_record').val();
     y = new Date().getFullYear();
     getData({'r': r, 'y': y});
   }
 
   function getData(params) {
 //    console.log(params);
-    var title = $('#badminton2_title').html('<h3>' + params['y'] + '</h3>');
-    var msg = $('#badminton2_msg').html('');
-    var container = $('#badminton2_plot');
-    var controls = $('#badminton2_controls').empty();
-    var links = $('#badminton2_links').empty();
+    var title = $('#badminton_title').html('<h3>' + params['y'] + '</h3>');
+    var msg = $('#badminton_msg').html('');
+    var container = $('#badminton_plot');
+    var controls = $('#badminton_controls').empty();
+    var links = $('#badminton_links').empty();
     $.ajax({
       url: 'get-data/',
       type: 'post',
@@ -183,7 +183,7 @@ $(function() {
 
   function pieLabelFormatter(label, series) {
 //    console.log(series);
-    return '<div class="badminton2_pie_label">'
+    return '<div class="badminton_pie_label">'
       + label + ': ' + series.percent.toFixed(2) + '%, £'
       + series.data[0][1].toFixed(2) + '</div>';
 //      + label + ': ' + series.percent.toFixed(2) + '%'
@@ -196,7 +196,7 @@ $(function() {
           if (previousLabel != item.series.label || previousPoint != item.dataIndex) {
             previousPoint = item.dataIndex;
             previousLabel = item.series.label;
-            $('#badminton2_tooltip').remove();
+            $('#badminton_tooltip').remove();
 
             var x = item.datapoint[0];
             var y = item.datapoint[1];
@@ -220,14 +220,14 @@ $(function() {
           }
         }
       } else {
-        $('#badminton2_tooltip').remove();
+        $('#badminton_tooltip').remove();
         previousPoint = null;
       }
     });
   }
 
   function showTooltip(x, y, color, contents) {
-    $('<div id="badminton2_tooltip">' + contents + '</div>').css({
+    $('<div id="badminton_tooltip">' + contents + '</div>').css({
       'top': y,
       'left': x,
       'border': '2px solid ' + color

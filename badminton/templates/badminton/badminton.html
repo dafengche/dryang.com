@@ -2,8 +2,8 @@
 {% load authz %}
 
 {% block css_and_js %}
-<link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}badminton2/css/badminton2.css'/>
-<script type='text/javascript' src='{{ STATIC_URL }}badminton2/js/badminton2.js'></script>
+<link rel='stylesheet' type='text/css' href='{{ STATIC_URL }}badminton/css/badminton.css'/>
+<script type='text/javascript' src='{{ STATIC_URL }}badminton/js/badminton.js'></script>
 <!--[if lte IE 8]><script language='javascript' type='text/javascript' src='{{ STATIC_URL }}common/flot-0.8.3/excanvas.min.js'></script><![endif]-->
 <script type='text/javascript' src='{{ STATIC_URL }}common/flot-0.8.3/jquery.flot.min.js'></script>
 <script type='text/javascript' src='{{ STATIC_URL }}common/flot-0.8.3/jquery.flot.pie.min.js'></script>
@@ -14,7 +14,7 @@
 <form>{% csrf_token %}
   <div>
     <b>Record:</b>
-    <select id="badminton2_record" class="badminton2_select">
+    <select id="badminton_record" class="badminton_select">
   {% if user|is_user_in_group:"badminton_organiser" %}
       <option value="g" selected="selected">Games</option>
       <option value="p">Players</option>
@@ -30,9 +30,9 @@
 {% endblock %}
 
 {% block main %}
-<div id='badminton2_title'></div>
-<div id='badminton2_links'></div>
-<div id='badminton2_msg'></div>
-<div id='badminton2_plot'></div>
-<div id='badminton2_controls'></div>
+<div id='badminton_title'></div>
+<div id='badminton_links'></div>
+<div id='badminton_msg'></div>
+<div id='badminton_plot'></div>
+<div id='badminton_controls'></div>
 {% endblock %}

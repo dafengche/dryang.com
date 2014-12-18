@@ -2,9 +2,5 @@
 
 {% block main %}
 <h2>Friday badminton club</h2>
-{% if msg %}
-{{msg}}
-{% else %}
 <div>Welcome to Friday badminton club! Please <a href="{% url 'dryang-auth:login' %}?next={% url 'dryang-badminton:index' %}">log in</a> to  access your records.</div>
-{% endif %}
 {% endblock %}

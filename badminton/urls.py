@@ -4,7 +4,6 @@ from badminton import views
 
 urlpatterns = patterns('',
     url(r'^$', views.index, name = 'index'),
-    url(r'^list/$', views.list, name = 'list'),
-    url(r'^list-all/$', views.list_all, name = 'list-all'),
+    url(r'^get-data/$', views.get_data, name = 'get-data'),
 )
 

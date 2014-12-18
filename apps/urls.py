@@ -11,7 +11,6 @@ urlpatterns = patterns('',
     url(r'^demo/', include('demo.urls', namespace = 'dryang-demo')),
     url(r'^verif/', include('verif.urls', namespace = 'dryang-verif')),
     url(r'^badminton/', include('badminton.urls', namespace = 'dryang-badminton')),
-    url(r'^badminton2/', include('badminton2.urls', namespace = 'dryang-badminton2')),
     url(r'^auth/', include('common.auth.urls', namespace = 'dryang-auth')),
     url(r'^admin/', include(admin.site.urls)),
 )

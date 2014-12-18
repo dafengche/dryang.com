@@ -1,23 +1,17 @@
-import json
-import logging
+from __future__ import absolute_import
 
-from datetime import date
-from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from common.auth.utils import is_user_in_group
+import json
+import logging
 
 from badminton.models import Contribution, Cost, Game
+from common.auth.utils import is_user_in_group
 
 logger = logging.getLogger(__name__)
-
-def is_user_in_group_badminton_player(user):
-    return is_user_in_group(user, 'badminton_player')
-
-def is_user_in_group_badminton_organiser(user):
-    return is_user_in_group(user, 'badminton_organiser')
 
 def get_play_count(year):
     """
@@ -28,131 +22,172 @@ def get_play_count(year):
     for g in games: play_count += len(g.players.all())
     return play_count
 
-def get_bal(year):
+def get_costs(year):
     """
-    Return balance (contributions - costs) of the given year
+    Return costs of the given year
     """
-    bal = 0.
-    contribs = Contribution.objects.filter(financial_year = year)
-    for c in contribs: bal += c.amount
+    sum = 0.
     costs = Cost.objects.filter(financial_year = year)
-    for c in costs: bal -= c.amount
-    return bal
+    for c in costs: sum += c.amount
+    return sum
 
-def get_players(year):
+def get_staff_committee_contribs(year):
     """
-    Return a sorted list containing info below of the given year
-    (first_name last_name, (play_count, balance))
+    Return staff committee's contributions of the given year
+    """
+    sum = 0.
+    contribs = Contribution.objects.filter(financial_year = year) \
+                        .filter(type__name = "Staff committee's contribution")
+    for c in contribs: sum += c.amount
+    return sum
+
+def get_cost_per_play(year):
+    """
+    Return cost per play for a given year
+    """
+    play_count = get_play_count(year)
+    if play_count == 0: return 0
+    else: return (get_costs(year) - get_staff_committee_contribs(year)) \
+                        / play_count
+
+def get_players_bal(year):
+    """
+    Return a dictioinary containing info below of the given year
+    {'cost_per_play': cost per play,
+     'player_records' [
+        {'username': username,
+         'first_name': first_name,
+         'last_name': last_name,
+         'contrib': contributions this player made,
+         'game_dates': [games this player played],
+        },
+        {
+        }
+     ],
+    }
     """
     games = Game.objects.filter(play_date__year = year)
     if len(games) == 0: return None
 
     player_count = {}
-    player_name = {}
     for g in games:
         players = g.players.all()
         for p in players:
-            if p.username in player_count: player_count[p.username] += 1
-            else:
-                player_count[p.username] = 1
-                player_name[p.username] = p.first_name + ' ' + p.last_name
+            if p not in player_count:
+                player_count[p] = []
+#            player_count[p].append(g.play_date) # Non-serializable
+            player_count[p].append(g.play_date.isoformat())
 
-    player_bal = {}
-    cost_per_play = get_bal(year) / get_play_count(year)
+    cost_per_play = get_cost_per_play(year)
+    
+    players_bal = {
+        'cost_per_play': get_cost_per_play(year),
+        'player_records': []
+    }
     for (k, v) in player_count.items():
-        player_bal[player_name[k]] = (v, cost_per_play * v)
+        ctb = 0.
         contribs = Contribution.objects.filter(financial_year = year) \
-                        .filter(contributor__username = k)
-        for c in contribs: player_bal[player_name[k]][0] += c.amount
-    return sorted(player_bal.iteritems())
+                        .filter(contributor__username = k.username)
+        for c in contribs: ctb += c.amount
+        d = k.as_json()
+        d.update({'contrib': ctb, 'game_dates': v})
+        players_bal['player_records'].append(d)
+    return players_bal
 
-def get_user_bal_and_games(year, username):
+def get_player_bal(year, username):
     """
-    Return a tuple (balance, games_player) for a given user in a given year
+    Return a list of info below for a given user in a given year
+    {'cost_per_play': cost per play,
+     'contrib': contributions this player made,
+     'game_list': [games this player played],
+    }
     """
-    bal = get_bal(year)
-    play_count = get_play_count(year)
-    if play_count == 0: return (0., None)
-
-    # Calculate user' balance
-    user_bal = 0.
-    contribs = Contribution.objects.filter(financial_year = year) \
-                        .filter(contributor__username = username)
-    for c in contribs: user_bal += c.amount
     games = Game.objects.filter(play_date__year = year) \
                         .filter(players__username = username)
-    if len(games) > 0: user_bal += bal / play_count * len(games)
-    return (user_bal, games)
+    if len(games) == 0: return None
+
+#    game_dates = [g.play_date for g in games] # Non-serializable
+    game_dates = [g.play_date.isoformat() for g in games]
+
+    cost_per_play = get_cost_per_play(year)
+
+    ctb = 0.
+    contribs = Contribution.objects.filter(financial_year = year) \
+                        .filter(contributor__username = username)
+    for c in contribs: ctb += c.amount
+
+    return {'cost_per_play': cost_per_play,
+            'contrib': ctb,
+            'game_dates': game_dates}
 
 def index(request):
-    data = {'title': 'Friday badminton'}
     if request.user.is_authenticated():
-        if is_user_in_group_badminton_organiser(request.user):
-            logger.debug(request.user.username + \
-                        ' is a member of group badminton_organiser')
-            return redirect(reverse('dryang-badminton:list-all'), data)
-        elif is_user_in_group_badminton_player(request.user):
-            logger.debug(request.user.username + \
-                        ' is a member of group badminton_player')
-            return redirect(reverse('dryang-badminton:list'), data)
+        logger.debug('User is authenticated')
+        if is_user_in_group(request.user, 'badminton_organiser') or \
+                    is_user_in_group(request.user, 'badminton_player'):
+            return render(request, 'badminton/badminton.html',
+                    {'title': 'Friday badminton'})
         else:
-            data['msg'] = 'Sorry, ' + request.user.first_name + \
-                        ', you are not allowed to view the page!'
-
-    return render(request, 'badminton/index.html', data)
+            return redirect(reverse('dryang-auth:access-denied'),
+                    {'title': 'Friday badminton'})
+    else:
+        return render(request, 'badminton/index.html',
+                    {'title': 'Friday badminton'})
 
 @login_required(login_url = reverse_lazy('dryang-auth:login'))
-@user_passes_test(is_user_in_group_badminton_player, \
-login_url = '/auth/access-denied/')
-def list(request):
-    year = request.GET.get('year', None)
-    if not year: year = date.today().year
-    else:
-        logger.debug("Found parameter 'year' in request")
-        year = int(year)
-    logger.debug('Year: %d' % year)
+def get_data(request):
+    if request.is_ajax():
+        if request.method == 'POST':
+            params = json.loads(request.body)
+            logger.debug('Parameters: ' + str(params))
+            if not 'r' in params:
+                return HttpResponse(
+                    json.dumps({'error': "Parameter 'r' not found!"}),
+                    content_type = 'application/json')
+            if not 'y' in params: return HttpResponse(
+                    json.dumps({'error': "Parameter 'y' not found!"}),
+                    content_type = 'application/json')
+            r = params['r']
+            y = params['y']
+            if r not in ['b', 'g', 'p', 'c', 'ctb']:
+                return HttpResponse(
+                    json.dumps({'error': 'Unsupported parameter r: ' + r}),
+                    content_type = 'application/json')
 
-    bal_and_games = get_user_bal_and_games(year, request.user.username)
+            data = None
+            if r == 'b':
+                if not is_user_in_group(request.user, 'badminton_player'):
+                    logger.warning('%s is not a member of group \
+                        badminton_player' % request.user.username)
+                    return HttpResponse(
+                        json.dumps({'error': 'Access denied'}),
+                        content_type = 'application/json')
+                data = get_player_bal(y, request.user.username) 
+            else:
+                if not is_user_in_group(request.user, 'badminton_organiser'):
+                    logger.warning('%s is not a member of group \
+                        badminton_organiser' % request.user.username)
+                    return HttpResponse(
+                        json.dumps({'error': 'Access denied'}),
+                        content_type = 'application/json')
+                if r == 'g':
+                    data = Game.objects.filter(play_date__year = y)
+                    data = [g.as_json() for g in data]
+                elif r == 'p':
+                    data = get_players_bal(y)
+                elif r == 'c':
+                    data = Cost.objects.filter(financial_year = y)
+                    data = [c.as_json() for c in data]
+                else: # ctb
+                    data = Contribution.objects.filter(financial_year = y)
+                    data = [c.as_json() for c in data]
 
-    data = {'title'       : 'Friday badminton',
-            'year'        : year,
-            'current_year': date.today().year,
-            'my_bal'      : bal_and_games[0],
-            'my_games'    : bal_and_games[1]}
-    return render(request, 'badminton/list.html', data)
+            # At this point, data should be JSON serialisable
+            if data: logger.debug(data)
+            return HttpResponse(
+                json.dumps({'data': data}),
+                content_type = 'application/json')
 
-@login_required(login_url = reverse_lazy('dryang-auth:login'))
-@user_passes_test(is_user_in_group_badminton_organiser, \
-login_url = '/auth/access-denied/')
-def list_all(request):
-    param = request.GET.get('p', None)
-    if not param: param = 'game'
-    logger.debug('p=' + param)
-    year = request.GET.get('year', None)
-    if not year: year = date.today().year
-    else:
-        year = int(year)
-    logger.debug('Year: %d' % year)
-
-    data = {'title'       : 'Friday badminton',
-            'p'           : param,
-            'year'        : year,
-            'current_year': date.today().year,
-            'bal'         : get_bal(year),
-            'play_count'  : get_play_count(year),
-            'is_player'   : is_user_in_group_badminton_player(request.user)}
-
-    if param == 'game':
-        data['games'] = Game.objects.filter(play_date__year = year)
-    elif param == 'player':
-        data['players'] = get_players(year)
-    elif param == 'cost':
-        data['costs'] = Cost.objects.filter(financial_year = year)
-    elif param == 'contrib':
-        data['contribs'] = Contribution.objects.filter(financial_year = year)
-    elif param == 'mybal':
-        bal_and_games = get_user_bal_and_games(year, request.user.username)
-        data['my_bal'] = bal_and_games[0]
-        data['my_games'] = bal_and_games[1]
-
-    return render(request, 'badminton/list-all.html', data)
+    return HttpResponse(
+            json.dumps({'error': 'Request failed!'}),
+            content_type = 'application/json')
