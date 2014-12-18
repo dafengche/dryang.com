@@ -31,12 +31,13 @@ def get_costs(year):
     for c in costs: sum += c.amount
     return sum
 
-def get_contribs(year):
+def get_staff_committee_contribs(year):
     """
-    Return contributions of the given year
+    Return staff committee's contributions of the given year
     """
     sum = 0.
-    contribs = Contribution.objects.filter(financial_year = year)
+    contribs = Contribution.objects.filter(financial_year = year) \
+                        .filter(type__name = "Staff committee's contribution")
     for c in contribs: sum += c.amount
     return sum
 
@@ -46,7 +47,8 @@ def get_cost_per_play(year):
     """
     play_count = get_play_count(year)
     if play_count == 0: return 0
-    else: return (get_costs(year) - get_contribs(year)) / play_count
+    else: return (get_costs(year) - get_staff_committee_contribs(year)) \
+                        / play_count
 
 def get_players_bal(year):
     """
