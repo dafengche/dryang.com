@@ -23,7 +23,7 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-OUTPUT_DIR = '/var/share/download_data'
+OUTPUT_DIR = '/usr/share/nginx/download_data'
 URL_PREFIX = 'http://web01.dryang.com:8008'
 
 @app.task
