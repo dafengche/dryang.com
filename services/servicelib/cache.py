@@ -12,7 +12,7 @@ logger.setLevel(logging.DEBUG)
 
 class CacheControl(object):
 
-    def __init__(self, time = 0, host = 'mw01', port = '11211'):
+    def __init__(self, time = 0, host = 'localhost', port = '11211'):
         '''
         time = 0 means forever
         '''

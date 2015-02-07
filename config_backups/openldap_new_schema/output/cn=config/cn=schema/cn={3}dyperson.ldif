@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
-# CRC32 08a02642
+# CRC32 b5b43239
 dn: cn=dyperson,cn=schema,cn=config
 objectClass: olcSchemaConfig
 cn: dyperson

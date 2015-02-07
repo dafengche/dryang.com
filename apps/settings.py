@@ -74,7 +74,7 @@ DATABASES = {
         'NAME': 'django',
         'USER': 'django',
         'PASSWORD': 'django',
-        'HOST': 'db01.dryang.com',
+        'HOST': 'localhost',
         'PORT': '', # Empty string for the default value
     }
 }
@@ -101,7 +101,7 @@ STATIC_URL = '/static/'
 # List of additional locations for
 # django.contrib.staticfiles.finders.FileSystemFinder, 23OCT14
 STATICFILES_DIRS = (
-    '/home/maxy/git/dev/dryang.com/common/static',
+    '/home/maxy/git/dryang.com/common/static',
 )
 # Notice the default STATICFILES_FINDERS are
 # django.contrib.staticfiles.finders.FileSystemFinder and
@@ -111,7 +111,7 @@ STATICFILES_DIRS = (
 # List of locations of the template source files searched by
 # django.template.loaders.filesystem.loader, in search order
 TEMPLATE_DIRS = (
-    '/home/maxy/git/dev/dryang.com/common/templates',
+    '/home/maxy/git/dryang.com/common/templates',
 )
 # Notice the default TEMPLATE_LOADERS are
 # django.template.loaders.filesystem.Loader and
@@ -171,8 +171,8 @@ LOGGING = {
 
 
 # Celery, 30SEP14
-BROKER_URL = 'amqp://mw01/'
-CELERY_RESULT_BACKEND = 'redis://mw01/'
+BROKER_URL = 'amqp://localhost/'
+CELERY_RESULT_BACKEND = 'redis://localhost/'
 # 2OCT14
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_SERIALIZER = 'json'
@@ -188,7 +188,7 @@ AUTHENTICATION_BACKENDS = (
     'common.auth.backends.LDAPBackend',
 #    'django.contrib.auth.backends.ModelBackend',
 )
-LDAP_SERVER_URI = 'ldap://mw01'
+LDAP_SERVER_URI = 'ldap://localhost'
 LDAP_DIR_USER = 'ou=Users,dc=dryang,dc=com'
 
 # AuthN related URLs

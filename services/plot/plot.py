@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 OUTPUT_DIR = '/var/share/download_data'
-URL_PREFIX = 'http://web01:8008'
+URL_PREFIX = 'http://web01.dryang.com:8008'
 
 @app.task
 def make_plot_mpl(params):
