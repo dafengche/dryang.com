@@ -98,6 +98,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# For collecting static files, python manage.py collectstatic
+STATIC_ROOT = '/home/maxy/git/dryang.com/static/'
+
 # List of additional locations for
 # django.contrib.staticfiles.finders.FileSystemFinder, 23OCT14
 STATICFILES_DIRS = (
