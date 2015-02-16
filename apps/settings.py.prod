@@ -171,8 +171,8 @@ LOGGING = {
 
 
 # Celery, 30SEP14
-BROKER_URL = 'amqp://rabbitmq01/'
-CELERY_RESULT_BACKEND = 'redis://redis01/'
+BROKER_URL = 'amqp://broker01/'
+CELERY_RESULT_BACKEND = 'redis://backend01/'
 # 2OCT14
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_SERIALIZER = 'json'
