@@ -1,12 +1,12 @@
-BROKER_URL = 'amqp://'
-CELERY_RESULT_BACKEND = 'redis://'
+BROKER_URL = 'amqp://broker01'
+CELERY_RESULT_BACKEND = 'redis://backend01'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 #
 CELERY_INCLUDE = [
     'services.compute.compute',
-    'services.plot.plot',
+#    'services.plot.plot',
     'services.station.station',
 ]
 '''
