@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE - DO NOT EDIT!! Use ldapmodify.
-# CRC32 7113a607
+# CRC32 f4416bd0
 dn: cn=schema
 objectClass: olcSchemaConfig
 cn: schema
@@ -940,9 +940,9 @@ olcObjectClasses: ( OLcfgDbOc:7.2 NAME 'olcOvSocketConfig' DESC 'Socket overla
  y configuration' SUP olcOverlayConfig STRUCTURAL MUST olcDbSocketPath MAY ( o
  lcDbSocketExtensions $ olcOvSocketOps $ olcOvSocketResps ) )
 structuralObjectClass: olcSchemaConfig
-entryUUID: f92ade28-f8bc-1033-826e-bd6af7522cfc
+entryUUID: 53c861a0-432e-1034-9929-1f7d90783b1f
 creatorsName: cn=config
-createTimestamp: 20141104222340Z
-entryCSN: 20141104222340.511111Z#000000#000#000000
+createTimestamp: 20150207160131Z
+entryCSN: 20150207160131.712126Z#000000#000#000000
 modifiersName: cn=config
-modifyTimestamp: 20141104222340Z
+modifyTimestamp: 20150207160131Z

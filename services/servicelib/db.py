@@ -9,7 +9,7 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-HOST = 'db01'
+HOST = 'localhost'
 DB = 'verif'
 USER = 'verif'
 PASS = 'verif'
