@@ -1,0 +1,41 @@
+.badminton_select {
+  width : 10em;
+  margin: 0.2em;
+}
+
+.badminton_pie_label {
+  border    : 1px solid grey;
+  font-size : 8pt;
+  text-align: center;
+  padding   : 5px;
+  color     : white;
+}
+
+#badminton_title {
+}
+
+#badminton_title h3 {
+}
+
+#badminton_links {
+}
+
+#badminton_links a {
+}
+
+#badminton_msg {
+}
+
+#badminton_plot {
+  width : 640px;
+  height: 400px;
+}
+
+#badminton_tooltip {
+  position        : absolute;
+  display         : none;
+  padding         : 3px;
+  font-size       : 9px;
+  background-color: #FFFFFF;
+  opacity         : 0.8;
+}

@@ -1,0 +1,51 @@
+html, body {
+  margin : 0;
+  padding: 0;
+  height : 100%;
+}
+
+/* If position set to relative, then elements within container will be
+ * positioned relative to container */
+#container {
+  min-height: 100%;
+  position  : relative;
+}
+
+#header { /* container -> header */
+  background-color: #D8D8D8;
+  margin          : 0;
+}
+
+#content { /* container -> content */
+  padding-bottom: 2em; /* Heighter of footer */
+}
+
+#footer { /* container -> footer */
+  background-color: #D8D8D8;
+  position        : absolute;
+  bottom          : 0;
+  height          : 2em;
+  width           : 100%;
+}
+
+#nav { /* container -> content -> nav */
+  float : left;
+  margin: 0 2em 0 0; /* top right bottom left */
+  width : 12em;
+  height: 100%;
+}
+
+#main { /* container -> content -> main */
+  margin-left: 12em; /* Width of nav */
+}
+
+#user p {
+  margin    : 0;
+  text-align: right;
+}
+
+#footer p {
+  margin    : 0;
+  padding   : 0.5em 0 0 0;
+  text-align: center;
+}
