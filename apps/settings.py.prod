@@ -144,27 +144,27 @@ LOGGING = {
         },
     },
     'loggers': {
-#        'django': {
-##            'handlers': ['console', 'file'],
-#            'handlers':['console'],
-#            'propagate': True,
-#            'level': 'DEBUG',
-#        },
+        'django': {
+#            'handlers': ['console', 'file'],
+            'handlers':['console'],
+            'propagate': True,
+            'level': 'INFO',
+        },
         'badminton': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
         },
         'demo': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
         },
         'verif': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
         },
         'common.auth': {
             'handlers': ['console'],
-            'level': 'DEBUG',
+            'level': 'INFO',
         },
     }
 }
