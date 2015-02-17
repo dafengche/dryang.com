@@ -101,7 +101,7 @@ STATIC_URL = '/static/'
 # List of additional locations for
 # django.contrib.staticfiles.finders.FileSystemFinder, 23OCT14
 STATICFILES_DIRS = (
-    '/var/django/dryang.com/common/static',
+    '/var/code/dryang.com/common/static',
 )
 # Notice the default STATICFILES_FINDERS are
 # django.contrib.staticfiles.finders.FileSystemFinder and
@@ -111,7 +111,7 @@ STATICFILES_DIRS = (
 # List of locations of the template source files searched by
 # django.template.loaders.filesystem.loader, in search order
 TEMPLATE_DIRS = (
-    '/var/django/dryang.com/common/templates',
+    '/var/code/dryang.com/common/templates',
 )
 # Notice the default TEMPLATE_LOADERS are
 # django.template.loaders.filesystem.Loader and
