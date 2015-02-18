@@ -5,6 +5,7 @@ import logging
 from time import sleep
 
 from services.celery import app
+from services import celery_worker_config as cfg
 from services.servicelib.cache import CacheControl
 
 logging.basicConfig()
@@ -31,9 +32,10 @@ def div(x, y):
     logger.debug('div() called')
     return compute(x, y, 'div')
 
-@CacheControl(time = 600)
+@CacheControl(host = cfg.cache['host'], port = cfg.cache['port'], time = cfg.cache['time'])
 def compute(x, y, o):
     logger.debug('compute() called')
+    logger.debug('Cache: %s:%s, valid for %ds' % (cfg.cache['host'], cfg.cache['port'], cfg.cache['time']))
     r = None
     if 'add' == o: r = x + y
     elif 'sub' == o: r = x - y

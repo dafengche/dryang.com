@@ -2,8 +2,8 @@ from __future__ import absolute_import
 
 import logging
 
+from services import celery_worker_config as cfg
 from services.celery import app
-from services.servicelib.cache import CacheControl
 from services.servicelib.db import query_db
 
 logging.basicConfig()
@@ -43,4 +43,8 @@ def get_stations(params):
                 'FROM gac_%(dataset)s_stations '
                 "WHERE UPPER(name) LIKE UPPER('%(name)s%%')"
                 % params)
-    return query_db(query)
+    return query_db(query, host = cfg.station['db_host'],
+                port = cfg.station['db_port'],
+                dbname = cfg.station['db_name'],
+                user = cfg.station['db_user'],
+                password = cfg.station['db_pass'])
