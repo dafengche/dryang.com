@@ -1,3 +1,10 @@
+# dev vs prod
+apps/settings.py
+services/celeryconfig.py
+services/celery_worker_config.py
+#
+# Other files
+#
 *.log
 *.pyc
 *.sqlite3
