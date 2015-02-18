@@ -15,6 +15,7 @@ import socket
 from datetime import datetime
 from mpl_toolkits.basemap import Basemap
 
+from services import celery_worker_config as cfg
 from services.celery import app
 from services.servicelib.cache import CacheControl
 from services.servicelib.db import query_db
@@ -23,10 +24,6 @@ logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-OUTPUT_DIR = '/usr/share/nginx/download_data'
-#URL_PREFIX = 'http://dev.dryang.com:8008'
-URL_PREFIX = 'http://dev.dryang.com/download'
-
 @app.task
 def make_plot_mpl(params):
     logger.debug('make_plot_mpl() called')
@@ -34,14 +31,14 @@ def make_plot_mpl(params):
 
     return _make_plot(params)
 
-@CacheControl(time = 600)
+@CacheControl(host = cfg.cache['host'], port = cfg.cache['port'], time = cfg.cache['time'])
 def _make_plot(params):
     dataset = params['dataset']
     if dataset not in ['boe', 'emep', 'gaw']:
         return {'error': 'Unsupported dataset: ' + dataset}
 
     plot_type = params['plot_type']
-    if plot_type not in ['histogram', 'mean_plot', 'scatter_plot', 'score_map', 'time_series']:
+    if plot_type not in ['score_map', 'time_series']:
         return {'error': 'Unsupported plot type: ' + plot_type}
 
     if dataset == 'boe' and plot_type != 'time_series':
@@ -62,21 +59,7 @@ def _make_plot(params):
     fig = plt.figure(figsize = (width, height))
     ax = fig.add_subplot(1, 1, 1) # Returns an Axes instance
 
-    if 'mean_plot' == plot_type:
-        x = np.linspace(-2, 2, 100)
-
-        ax.plot(x, x, label = 'linear')
-        ax.plot(x, x**2, label = 'quadratic')
-        ax.plot(x, x**3, label = 'cubic')
-
-        ax.set_xlabel('x')
-        ax.set_ylabel('y')
-        ax.set_title('Simple plot')
-        #ax.set_xlim(-2, 2)
-        ax.set_ylim(-8, 8)
-        ax.grid(True)
-        ax.legend()
-    elif 'score_map' == plot_type:
+    if 'score_map' == plot_type:
         sw_lat = -90.
         sw_lon = -180.
         ne_lat = 90.
@@ -101,7 +84,11 @@ def _make_plot(params):
                     'FROM gac_emep_stations')
         else: # GAW
             query = ('SELECT id, lat, lon FROM gac_gaw_stations')
-        data = query_db(query)
+        data = query_db(query, host = cfg.plot['db_host'],
+                    port = cfg.plot['db_port'],
+                    dbname = cfg.plot['db_name'],
+                    user = cfg.plot['db_user'],
+                    password = cfg.plot['db_pass'])
         if 'error' in data: return data
         logger.debug(str(data['number_of_results']) + ' record(s) retrieved')
         stn_id_list = []
@@ -163,7 +150,11 @@ def _make_plot(params):
             logger.debug('start_date: ' + str(start_date))
             logger.debug('end_date: ' + str(end_date))
             query += " WHERE ddate BETWEEN '" + start_date + "' AND '" + end_date + "'"
-        data = query_db(query)
+        data = query_db(query, host = cfg.plot['db_host'],
+                    port = cfg.plot['db_port'],
+                    dbname = cfg.plot['db_name'],
+                    user = cfg.plot['db_user'],
+                    password = cfg.plot['db_pass'])
         if 'error' in data: return data
         logger.debug(str(data['number_of_results']) + ' record(s) retrieved')
 
@@ -178,46 +169,6 @@ def _make_plot(params):
         plt.xticks(rotation = 20)
         ax.grid(True)
         ax.legend()
-    elif 'scatter_plot' == plot_type:
-        N = 50
-        x = np.random.rand(N)
-        y = np.random.rand(N)
-        colors = np.random.rand(N)
-        area = np.pi * (15 * np.random.rand(N)) ** 2 # 0 to 15 point radiuses
-        ax.scatter(x, y, s = area, c = colors, label = 'demo')
-        ax.legend()
-    elif 'histogram' == plot_type:
-        xl = []
-        mu, sigma = 100, 15
-        x = mu + sigma * np.random.randn(10000)
-        xl.append(x)
-
-        mu, sigma = 100, 20
-        x = mu + sigma * np.random.randn(10000)
-        xl.append(x)
-
-        n, bins, patches = ax.hist(xl, bins = 50, normed = True,
-                    alpha = 0.75, histtype='step',
-                    color = ['b', 'r'],
-                    label = [r'$\sigma=15$', '$\sigma=20$']
-                    )
-
-        # The default legend of histogram shows boxes rather than lines. To show lines,
-        # custom artists are required
-        #artist_0 = plt.Line2D((0, 1), (0, 0), color = 'b')
-        #artist_1 = plt.Line2D((0, 1), (0, 0), color = 'r')
-        artist_0 = lines.Line2D((0, 1), (0, 0), color = 'b')
-        artist_1 = lines.Line2D((0, 1), (0, 0), color = 'r')
-
-        # Create legend from custom artist/label lists
-        ax.legend([artist_0, artist_1], [r'$\sigma=15$', '$\sigma=20$'])
-
-        ax.set_xlabel('Value')
-        ax.set_ylabel('Frequency')
-        ax.set_title(r'$\mathrm{Standard\ normal\ distribution:}\ \mu=100$')
-        ax.set_xlim(40, 160)
-        ax.set_ylim(0, 0.03)
-        ax.grid(True)
 
     # Get metadata
     metadata = {}
@@ -243,13 +194,13 @@ def _make_plot(params):
     ts = datetime.utcnow().strftime('%Y%m%d%H%M%S')
     suffix = '.png'
     file_name = '%s-%s-%s-%04d%s' % (socket.gethostname(), prefix, ts, os.getpid(), suffix)
-    full_name = '%s/%s' % (OUTPUT_DIR, file_name)
+    full_name = '%s/%s' % (cfg.plot['output_dir'], file_name)
     logger.debug('Output: ' + full_name)
     plt.savefig(full_name, dpi = DPI)
 
     # Set additional info
     output = {}
     output['metadata'] = metadata
-    output['url'] = URL_PREFIX + '/' + file_name
+    output['url'] = cfg.plot['url_prefix'] + '/' + file_name
 
     return output

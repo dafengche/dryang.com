@@ -13,8 +13,7 @@ if [ $flag != "dev" ] && [ $flag != "prod" ]; then
 fi
 
 cp ./apps/settings.py.$flag ./apps/settings.py
-cp ./services/celeryconfig.py.$flag ./services/celeryconfig.py
-cp ./services/servicelib/cache.py.$flag ./services/servicelib/cache.py
-cp ./services/servicelib/db.py.$flag ./services/servicelib/db.py
+cp ./services/celery_config.py.$flag ./services/celery_config.py
+cp ./services/celery_worker_config.py.$flag ./services/celery_worker_config.py
 
 echo "Failes copied"

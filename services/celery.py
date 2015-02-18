@@ -16,8 +16,8 @@ from celery import Celery
 #             include=['services.compute.compute', 'services.plot.plot'])
 app = Celery('services')
 # Load config file, it should be in your Python path or in the directory you
-# start Celery the worker server
-app.config_from_object('celeryconfig')
+# start the Celery worker server
+app.config_from_object('celery_config')
 
 # Optional configuration, see the application user guide
 #app.conf.update(

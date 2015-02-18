@@ -3,25 +3,23 @@ from __future__ import absolute_import
 import logging
 import psycopg2
 
+import services.celery_worker_config as cfg
 from services.servicelib.cache import CacheControl
 
 logging.basicConfig()
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-HOST = 'localhost'
-DB = 'verif'
-USER = 'verif'
-PASS = 'verif'
-
-@CacheControl(time = 3600)
-def query_db(query):
+@CacheControl(host = cfg.cache['host'], port = cfg.cache['port'], time = cfg.cache['time'])
+def query_db(query, *args, **kwargs):
     logger.debug(query)
+    logger.debug(str(args))
+    logger.debug(str(kwargs))
     conn = None
     cursor = None
     try:
-        conn = psycopg2.connect('host=%s dbname=%s user=%s password=%s' %
-            (HOST, DB, USER, PASS))
+        conn = psycopg2.connect('host=%s port=%s dbname=%s user=%s password=%s' %
+            (kwargs['host'], kwargs['port'], kwargs['dbname'], kwargs['user'], kwargs['password']))
         cursor = conn.cursor()
         cursor.execute(query)
         result = {'number_of_results': cursor.rowcount, 'data': cursor.fetchall()}
